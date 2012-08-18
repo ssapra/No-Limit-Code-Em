@@ -1,5 +1,7 @@
 require 'rubygems'
-require 'ruby-poker'
+require 'card.rb'
+require 'poker_hand.rb'
+require 'deck.rb'
 
 class Player
   
@@ -13,73 +15,32 @@ class Player
   end
 end
 
-class Deck
-  def initialize
-    @cards = []
-    Card::SUITS.each_byte do |suit|
-      # careful not to double include the aces...
-      Card::FACES[1..-1].each_byte do |face|
-        @cards.push(Card.new(face.chr, suit.chr))
-      end
-    end
-    shuffle
-  end
-
-  def shuffle
-    @cards = @cards.sort_by { rand }
-    return self
-  end
-
-  # removes a single card from the top of the deck and returns it
-  # synonymous to poping off a stack
-  def deal
-    @cards.pop
-  end
-
-  # delete an array or a single card from the deck
-  # converts a string to a new card, if a string is given
-  def burn(burn_cards)
-    return false if burn_cards.is_a?(Integer)
-    if burn_cards.is_a?(Card) || burn_cards.is_a?(String)
-      burn_cards = [burn_cards]
-    end
-
-    burn_cards.map! do |c|
-      c = Card.new(c) unless c.class == Card
-      @cards.delete(c)
-    end
-    true
-  end
-
-  # return count of the remaining cards
-  def size
-    @cards.size
-  end
-
-  def empty?
-    @cards.empty?
-  end
-end
-
-def introduction
+def introduction # Creates player objects 
   print "How many players? "
   number = gets.chomp.to_i
-  players = []
-  number.times do |index|  
-    print "Player #{index + 1} name: "
-    name = gets.chomp
-    players << Player.new(name)
-    puts "Hi " + players[index].name
+  if number > 1
+      players = []
+      number.times do |index|  
+        print "Player #{index + 1} name: "
+        name = gets.chomp
+        players << Player.new(name)
+        puts "Hi " + players[index].name
+      end
+      players
+  else
+      puts "There has to be more than 1 player."
+      puts "Leaving game table now..."
+      puts
+      return nil
   end
-  players
 end
 
-def init_round?
+def init_round? # Simulates registration 
   puts "Would you like to play Draw Poker? (yes/no)"
   "yes" == gets.chomp.downcase
 end
 
-def deal(players, deck)
+def deal(players, deck) # Deals 5 cards to everyone in the beginning
     5.times do 
       players.each do |player|
         player.hand << deck.deal
@@ -88,7 +49,7 @@ def deal(players, deck)
   return players, deck
 end
 
-def action(players)
+def action(players) # Offers player option to check, bet, or fold based on current situation
   if able_to_check?(players)
     print "Will you check, bet, or fold? "
   else 
@@ -107,11 +68,11 @@ def action(players)
   end
 end
 
-def able_to_check?(players)
+def able_to_check?(players) # Checks if a player is able to check
   maximum_bet(players) == 0
 end
 
-def betting(players, pot)
+def betting(players, pot) # Infinite loop runs until every player settles bet or folds
     while(true) 
       players.each do |player|
           if player.bet > 0
@@ -146,11 +107,16 @@ def betting(players, pot)
             puts
             puts "#{player.name}, here are your cards: #{player.hand}" 
             puts
+            puts "he is about to bet"
             player.bet = action(players)
-            
-            if player.bet < player.stack && player.bet >= maximum_bet(players)
-                if player.bet == 0 then puts "#{player.name} checks" else
-                puts "#{player.name} bets #{player.bet}" end
+            puts "#{player.bet}"
+            puts "player bets #{player.bet} and his stack is #{player.stack}"
+            if player.bet <= player.stack && player.bet >= maximum_bet(players)
+                if player.bet == 0  
+                  puts "#{player.name} checks" 
+                else
+                  puts "#{player.name} bets #{player.bet}" 
+                end
                 player.stack-=player.bet
                 pot+= player.bet
             else 
@@ -179,7 +145,7 @@ def reset_bets(players) # Resets bets to 0
   players
 end 
 
-def players_ready?(players)
+def players_ready?(players) # Checks if everyone has bet the same amount
   max_bet = maximum_bet(players)
   temp_array = []
   temp_array << max_bet
@@ -199,7 +165,7 @@ def maximum_bet(players) # Maximum bet returned from array of players
   maximum_bet
 end
 
-def replacement(players, deck)
+def replacement(players, deck) # Replaces as many cards as player wants
   players.each do |player|
     puts "#{player.name}, this is your hand: #{player.hand}"
     print "#{player.name}, will you replace any cards? (yes/no) "
@@ -221,14 +187,14 @@ def replacement(players, deck)
   return players, deck
 end
 
-def change_array_to_PokerHand(players)
+def change_array_to_PokerHand(players) # Array of cards changed to PokerHand object in order for comparison
   players.each do |player|
     player.hand = PokerHand.new(player.hand)
   end
   players
 end
 
-def determine_winner(players)
+def determine_winner(players) # PokerHand ranks compared. Ties taken into account
   players = change_array_to_PokerHand(players)
   winner = players.max {|a,b| a.hand.rank <=> b.hand.rank }
   winners = []
@@ -238,47 +204,49 @@ def determine_winner(players)
   winners
 end
 
-def round_over?(players)
+def round_over?(players) # Checks if everyone folds
   players.count == 1
 end
 
 if init_round?
     first_round_players = introduction
-    puts "Let's play poker"
-    deck = Deck.new
-    pot = 0
-    puts "There are #{deck.size} cards in the Deck"
-    players, deck = deal(first_round_players, deck)
+    if first_round_players
+      puts "Let's play poker"
+      deck = Deck.new
+      pot = 0
+      puts "There are #{deck.size} cards in the Deck"
+      players, deck = deal(first_round_players, deck)
    
-    second_round_players, pot = betting(players, pot)
-    if round_over?(second_round_players)
-        puts "#{second_round_players[0].name} has won #{pot} chips"
-    else
-        puts "There are #{pot} chips in the pot...Careful now"
-        players, deck = replacement(second_round_players, deck)
-        last_round_players, pot = betting(players,pot)
+      second_round_players, pot = betting(players, pot)
+      if round_over?(second_round_players)
+          puts "#{second_round_players[0].name} has won #{pot} chips"
+      else
+          puts "There are #{pot} chips in the pot...Careful now"
+          players, deck = replacement(second_round_players, deck)
+          last_round_players, pot = betting(players,pot)
         
-        if round_over?(last_round_players)
-            puts "#{last_round_players[0].name} wins #{pot} chips"
-        else
-            puts "There are #{pot} chips in the pot...Careful now"
-            winners = determine_winner(last_round_players)
-            if winners.count == 1
-                puts "#{winner.name} has won this round with #{winner.hand}."
-                puts "#{pot} chips go to #{winner.name}"
-            else 
-                division = winners.count
-                puts "The pot is split #{division}-way."
-                winners.each do |winner|
-                   puts "#{winner.name} takes #{pot/division} with #{winner.hand}"
-                   winner.stack+=pot/division
-                end
-            end
-            winner.stack+= pot
-            puts "Round standings: "
-            first_round_players.each do |player|
-              puts "#{player.name} has #{player.stack} chips"
-            end
-        end
-     end
+          if round_over?(last_round_players)
+              puts "#{last_round_players[0].name} wins #{pot} chips"
+          else
+              puts "There are #{pot} chips in the pot...Careful now"
+              winners = determine_winner(last_round_players)
+              if winners.count == 1
+                  puts "#{winners[0].name} has won this round with #{winners[0].hand}."
+                  puts "#{pot} chips go to #{winners[0].name}"
+              else 
+                  division = winners.count
+                  puts "The pot is split #{division}-way."
+                  winners.each do |winner|
+                     puts "#{winner.name} takes #{pot/division} with #{winner.hand}"
+                     winner.stack+=pot/division
+                  end
+              end
+              winner.stack+= pot
+              puts "Round standings: "
+              first_round_players.each do |player|
+                puts "#{player.name} has #{player.stack} chips"
+              end
+          end
+       end
+    end
 end
