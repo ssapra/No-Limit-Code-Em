@@ -273,4 +273,4 @@ if init_round?
 end
 end
 
-begin_game
+#begin_game

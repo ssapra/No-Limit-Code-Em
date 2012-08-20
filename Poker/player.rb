@@ -1,11 +1,14 @@
 class Player
   
-  attr_accessor :name, :stack, :hand, :bet
+  attr_accessor :name, :stack, :hand, :bet, :data
   
-  def initialize(name)
-    @name = name
-    @stack = 200
-    @hand = []
-    @bet = nil
+  def initialize
+    @data = {:name => "",
+             :hand => [],
+             :bet => 0,
+             :stack => 200,
+             :action => nil,
+             :round => true,
+             :playing => true}
   end
 end
