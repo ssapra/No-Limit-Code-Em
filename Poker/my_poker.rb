@@ -60,59 +60,60 @@ def betting(players, pot) # Loop through players as they check/bet/fold/etc
     while(true) 
       players.each do |player|
             if player.bet != nil && player.bet > 0
-              if player.bet < maximum_bet(players)
-                  puts "#{player.name}, here are your cards: #{player.hand}"
-                  puts "You have bet #{player.bet} and you have to at least match #{maximum_bet(players)}" 
-                  raise_bet = action(players)
+                if player.bet < maximum_bet(players)
+                    puts "#{player.name}, here are your cards: #{player.hand}"
+                    puts "You have bet #{player.bet} and you have to at least match #{maximum_bet(players)}" 
+                    raise_bet = action(players)
                   
-                  if raise_bet + player.bet == maximum_bet(players)
-                      puts
-                      puts "#{player.name} calls #{raise_bet + player.bet}"
-                      puts
-                      player.bet+=raise_bet
-                      player.stack-=raise_bet
-                      pot+=raise_bet
-                  elsif raise_bet + player.bet > maximum_bet(players)
-                      puts
-                      puts "#{player.name} raises #{raise_bet}"
-                      puts
-                      player.bet+=raise_bet
-                      player.stack-=raise_bet
-                      pot+=raise_bet
-                  else 
-                      puts
-                      puts "#{player.name} folds."
-                      puts
-                      players = players - [player]
-                  end
-              end
+                    if raise_bet + player.bet == maximum_bet(players)
+                        puts
+                        puts "#{player.name} calls #{raise_bet + player.bet}"
+                        puts
+                        player.bet+=raise_bet
+                        player.stack-=raise_bet
+                        pot+=raise_bet
+                    elsif raise_bet + player.bet > maximum_bet(players)
+                        puts
+                        puts "#{player.name} raises #{raise_bet}"
+                        puts
+                        player.bet+=raise_bet
+                        player.stack-=raise_bet
+                        pot+=raise_bet
+                    else 
+                        puts
+                        puts "#{player.name} folds."
+                        puts
+                        players = players - [player]
+                    end
+                end
         
-          else 
-            puts
-            puts "#{player.name}, here are your cards: #{player.hand}" 
-            puts "The maximum bet is #{maximum_bet(players)}"
-            puts
-            player.bet = action(players)
-            
-            if player.bet <= player.stack && player.bet >= maximum_bet(players)
-                if player.bet == 0 then puts "#{player.name} checks" else
-                puts "#{player.name} bets #{player.bet}" end
-                player.stack-=player.bet
-                pot+= player.bet
             else 
                 puts
-                puts "#{player.name} folds."
+                puts "#{player.name}, here are your cards: #{player.hand}." 
+                puts "The maximum bet is #{maximum_bet(players)}."
+                puts "You have #{player.stack} chips in your stack."
                 puts
-                players = players - [player]
+                player.bet = action(players)
+            
+                if player.bet <= player.stack && player.bet >= maximum_bet(players)
+                  if player.bet == 0 then puts "#{player.name} checks" else
+                    puts "#{player.name} bets #{player.bet}" end
+                  player.stack-=player.bet
+                  pot+= player.bet
+                else 
+                  puts
+                  puts "#{player.name} folds."
+                  puts
+                  players = players - [player]
+                end
             end
-          end
-          if(players_ready?(players))
-             players = reset_bets(players) # Chips put into the pot and current bets set to 0
-             return players, pot 
-          end 
-        end
+            
+            if(players_ready?(players))
+              reset_bets(players)
+              return players, pot
+            end
       end
-  end
+   end
 end
 
 def reset_bets(players) # Resets bets to 0 
@@ -132,6 +133,9 @@ def players_ready?(players) # Checks if everyone bet the maximum amount
     temp_array << max_bet
     player_bets = []
     players.each do |player|
+      if player.bet == nil
+        return false
+      end
       player_bets << player.bet
     end
   
