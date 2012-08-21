@@ -100,6 +100,7 @@ def betting(players, pot) # Loop through players as they check/bet/fold/etc
                
                 if player.data[:action] == "check" && min_bet <= player.data[:stack]
                   player.data[:bet] = min_bet
+                  player.data[:stack]-=min_bet
                   pot+=player.data[:bet]
                   puts
                   puts "#{player.data[:name]} checks"              
@@ -125,6 +126,10 @@ def betting(players, pot) # Loop through players as they check/bet/fold/etc
             end
       end
    end
+end
+
+def next_player_setting(players)
+  
 end
 
 def reset_round(players) # Resets bets to 0 
@@ -254,11 +259,13 @@ def begin_game
 if init_round?
     first_round_players = introduction
     if first_round_players
+        puts
         puts "Let's play poker"
         deck = Deck.new
         pot = 0
         while(first_round_players.count > 1)
-            puts "There are #{deck.size} cards in the Deck"
+            puts "Dealing cards..."
+            puts
             players, deck = deal(first_round_players, deck)
             second_round_players, pot = betting(players, pot)
               
@@ -275,6 +282,7 @@ if init_round?
                     last_round_players[0].data[:stack]+=pot
                 else  
                     puts "There are #{pot} chips in the pot...Careful now"
+                    puts
                     determine_winner(last_round_players, pot)
                 end
             end
@@ -282,11 +290,11 @@ if init_round?
             first_round_players = round_summary(first_round_players)
             pot = 0
             deck = Deck.new
+            puts
       end
-      
-      puts
       puts "The game is over"
-      puts "#{first_round_players[0].data[:name]} has won"
+      puts "#{first_round_players[0].data[:name]} has won!"
+      puts "Deconstructing game table now..."
   end
 end
 end
