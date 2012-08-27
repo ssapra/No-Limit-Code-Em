@@ -1,5 +1,5 @@
 require 'spec_helper'
-require './my_poker_v2'
+require './my_poker_v3'
 
 describe Deck do 
     
@@ -61,7 +61,7 @@ describe "Poker Game" do
       @players.each do |player|
         player.data[:bet] = 20
       end
-      reset_round(@players)
+      reset_bets(@players)
       @players.each do |player|
         player.data[:bet].should == 0
       end
