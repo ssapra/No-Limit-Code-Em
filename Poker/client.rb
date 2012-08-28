@@ -32,5 +32,20 @@ rescue
   puts "Did not connect"
 end
 
+if player_key
+  
+  print "Name: "
+  name = gets.chomp
+  print "Game Id: "
+  game_id = gets.chomp
+  # print "Player Key: "
+  #   player_key = gets.chomp
+  
+  new_response = Net::HTTP.post_form(url, {:name => name, :game_id => game_id, :player_key => player_key})
+  
+  puts JSON.parse(new_response.body)["message"]
+  
+end
+
 
   
