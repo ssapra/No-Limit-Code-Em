@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120829152510) do
+ActiveRecord::Schema.define(:version => 20120829185142) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
@@ -41,8 +41,16 @@ ActiveRecord::Schema.define(:version => 20120829152510) do
     t.integer  "game_id"
     t.string   "name"
     t.string   "player_key"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                           :null => false
+    t.datetime "updated_at",                           :null => false
+    t.text     "hand",       :default => "'--- []\n'"
+    t.integer  "bet",        :default => 0
+    t.integer  "stack",      :default => 500
+    t.string   "action"
+    t.boolean  "in_game",    :default => true
+    t.boolean  "in_round",   :default => true
+    t.boolean  "turn",       :default => false
+    t.integer  "table_id"
   end
 
   create_table "statuses", :force => true do |t|
