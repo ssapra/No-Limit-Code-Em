@@ -26,7 +26,6 @@ response = Net::HTTP.post_form(url, {:name => name, :game_id => game_id})
     else
       puts resp["message"]
     end
-    # puts JSON.parse(response.body)
   end
 rescue
   puts "Did not connect"
@@ -38,8 +37,6 @@ if player_key
   name = gets.chomp
   print "Game Id: "
   game_id = gets.chomp
-  # print "Player Key: "
-  #   player_key = gets.chomp
   
   new_response = Net::HTTP.post_form(url, {:name => name, :game_id => game_id, :player_key => player_key})
   

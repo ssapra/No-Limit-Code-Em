@@ -3,7 +3,7 @@ class RequestsController < ApplicationController
   
   
   def display
-    @inputs = Input.all
+    @players = Player.all
   end
   
   def post
@@ -15,18 +15,26 @@ class RequestsController < ApplicationController
     if player.player_key
       temp_player = Player.find_by_name(player.name)
       if Digest::MD5.hexdigest("#{temp_player.name} #{temp_player.game_id} TREY") == player.player_key
-        body = {:message => "You have already registered. Registration is currently open."}
+        if Status.first.registration
+          body = {:message => "You have already registered. Registration is closed. Waiting for game to begin."}
+        else
+          body = {:message => "You have already registered. Registration is still open."}
+        end
       else 
         body = {:message => "Invalid inputs"}
       end
-    else  
-        if player.valid? && player.game_id == 4
-          player.player_key = Digest::MD5.hexdigest("#{player.name} #{player.game_id} TREY")
-          player.save
-          Input.create(:data => params["name"]) 
-          body = {:message => "ok", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
+    else
+        if Status.first.registration
+          if player.valid? && player.game_id == 4
+            player.player_key = Digest::MD5.hexdigest("#{player.name} #{player.game_id} TREY")
+            player.save
+            #Input.create(:data => params["name"]) 
+            body = {:message => "ok", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
+          else
+            body = {:message => "Invalid inputs"}
+          end
         else
-          body = {:message => "Invalid inputs"}
+          body = {:message => "Sorry, registration has closed"}
         end
     end
     
