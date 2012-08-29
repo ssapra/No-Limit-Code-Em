@@ -11,12 +11,16 @@ class RequestsController < ApplicationController
     
     player = Player.new(:name => params["name"], :game_id => params["game_id"], :player_key => params["player_key"])
    
-   
+    
     if player.player_key
       temp_player = Player.find_by_name(player.name)
       if Digest::MD5.hexdigest("#{temp_player.name} #{temp_player.game_id} TREY") == player.player_key
         if Status.first.registration
           body = {:message => "You have already registered. Registration is closed. Waiting for game to begin."}
+        elsif Status.first.game && !Status.first.play
+          body = {:message => "The game is being created. Waiting for play to begin."}
+        elsif Status.first.game && Status.first.play
+          body = {:message => "It might be your turn. We're still working on it."}
         else
           body = {:message => "You have already registered. Registration is still open."}
         end
