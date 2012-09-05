@@ -8,13 +8,14 @@ class Player < ActiveRecord::Base
                   :action,
                   :in_game,
                   :in_round,
-                  :turn,
+                  :turn, #don't use for now
                   :table_id
                   
   serialize :hand
   
   validates :name, :uniqueness => true 
    
-  belongs_to :table 
+  belongs_to :table
+  belongs_to :seat
    
 end

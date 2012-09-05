@@ -8,5 +8,7 @@ ServerApp::Application.routes.draw do
   get "/requests" => 'requests#display', :as => :display
   get "/nothing" => 'requests#nothing', :as => :nothing
   post "/" => 'requests#post'
+  get "/states" => 'requests#states', :as => :states
+  get "/setup" => 'games#setup', :as => :setup
   
 end

@@ -31,16 +31,22 @@ rescue
   puts "Did not connect"
 end
 
-if player_key
+while player_key
   
   print "Name: "
   name = gets.chomp
   print "Game Id: "
   game_id = gets.chomp
   
-  new_response = Net::HTTP.post_form(url, {:name => name, :game_id => game_id, :player_key => player_key})
+  uri = URI('http://localhost:3000/states')
   
-  puts JSON.parse(new_response.body)["message"]
+  uri.query = URI.encode_www_form({:name => name, :game_id => game_id})
+  
+  res = Net::HTTP.get_response(uri)
+  puts JSON.parse(res.body)
+  
+  #new_response = Net::HTTP.post_form(url, {:name => name, :game_id => game_id, :player_key => player_key})
+  #puts JSON.parse(new_response.body)["message"]
   
 end
 
