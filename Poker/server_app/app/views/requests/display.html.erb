@@ -4,9 +4,9 @@
 	<p><%= player.name %> has connected to game <%= player.game_id %></p>
 <% end %>
 
-Registration is <%= status("registration") %>: <%= link_to "Toggle Registration", action_path(:type => "registration"), :method => :post %><br />
+Registration is <%= status("registration") %>: <%= link_to "Toggle Registration", status_path(:type => "registration"), :method => :post %><br />
 
-Game is <%= status("game") %>: <%= link_to "Toggle Game", action_path(:type => "game"), :method => :post %><br />
+Game is <%= status("game") %>: <%= link_to "Toggle Game", status_path(:type => "game"), :method => :post %><br />
 
-Play is <%= status("play") %>: <%= link_to "Toggle Play", action_path(:type => "play"), :method => :post %><br />
+Play is <%= status("play") %>: <%= link_to "Toggle Play", status_path(:type => "play"), :method => :post %><br />
 

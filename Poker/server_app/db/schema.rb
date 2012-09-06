@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120905035539) do
+ActiveRecord::Schema.define(:version => 20120906205347) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
@@ -41,16 +41,18 @@ ActiveRecord::Schema.define(:version => 20120905035539) do
     t.integer  "game_id"
     t.string   "name"
     t.string   "player_key"
-    t.datetime "created_at",                                   :null => false
-    t.datetime "updated_at",                                   :null => false
-    t.text     "hand",       :limit => 255, :default => "'"
-    t.integer  "bet",                       :default => 0
-    t.integer  "stack",                     :default => 500
+    t.datetime "created_at",                                    :null => false
+    t.datetime "updated_at",                                    :null => false
+    t.text     "hand",        :limit => 255, :default => "'"
+    t.integer  "bet",                        :default => 0
+    t.integer  "stack",                      :default => 500
     t.string   "action"
-    t.boolean  "in_game",                   :default => true
-    t.boolean  "in_round",                  :default => true
-    t.boolean  "turn",                      :default => false
+    t.boolean  "in_game",                    :default => true
+    t.boolean  "in_round",                   :default => true
+    t.boolean  "turn",                       :default => false
     t.integer  "table_id"
+    t.integer  "seat_id"
+    t.boolean  "replacement"
   end
 
   create_table "seats", :force => true do |t|
@@ -74,6 +76,7 @@ ActiveRecord::Schema.define(:version => 20120905035539) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
     t.integer  "turn_id"
+    t.integer  "min_bet"
   end
 
 end

@@ -1,6 +1,6 @@
 class StatusController < ApplicationController
 
-  def action
+  def status
     if params[:type] == "registration"
       status = Status.first
       if status.registration
@@ -27,9 +27,11 @@ class StatusController < ApplicationController
       else 
          status.game = true
          status.save!
-
+         Table.destroy_all
+         table = Table.new
+         table.setup
          respond_to do |format|
-           format.html { redirect_to setup_path }
+           format.html { redirect_to display_path }
          end
       end
     end
@@ -42,7 +44,12 @@ class StatusController < ApplicationController
       else 
          status.play = true
          status.save!
+         table = Table.first
+         table.next_action
       end
+      respond_to do |format|
+         format.html { redirect_to display_path }
+       end
     end
   end
 end

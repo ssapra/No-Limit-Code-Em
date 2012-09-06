@@ -3,4 +3,9 @@ class Seat < ActiveRecord::Base
   
   belongs_to :table
   has_one :player
+  
+  def next_seat
+    return Seat.find_by_id(self.id + 1)
+  end
+  
 end

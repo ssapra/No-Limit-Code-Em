@@ -2,15 +2,16 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   
   helper_method :respond_to_request,
-                :verify_player_turn?
-  
+                :verify_player_turn?,
+                :minimum_bet,
+                :players_ready?
+            
   protected
-  
   
   def verify_player_turn?(player)
      #if Digest::MD5.hexdigest("#{temp_player.name} #{temp_player.game_id} TREY") == player.player_key
       begin 
-         table = Table.find_by_id(player.table_id)
+         table = player.table
          if table.turn_id == player.id
            return true
          end

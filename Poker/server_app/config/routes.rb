@@ -1,14 +1,18 @@
 ServerApp::Application.routes.draw do
-  
-  post "/action" => 'status#action', :as => :action
 
   devise_for :admins
   
   get "/" => 'static_pages#home'
+  post "/" => 'requests#post'
+  
   get "/requests" => 'requests#display', :as => :display
   get "/nothing" => 'requests#nothing', :as => :nothing
-  post "/" => 'requests#post'
   get "/states" => 'requests#states', :as => :states
   get "/setup" => 'games#setup', :as => :setup
   
+  
+  post "/status" => 'status#status', :as => :status
+  post "/action" => 'games#action',:as => :action
+  
+  get "/poker" => 'games#poker', :as => :poker
 end

@@ -1,41 +1,22 @@
 class GamesController < ApplicationController
   include RubyPoker
   
-  def setup
+  def action
+    player = Player.find_by_name(params[:name])
+
+    if player && verify_player_turn?(player) && params[:player_action]
+      player.resolve_action(params[:player_action])
+      player.table.next_action
+    end
     
-    deck = Deck.new
-     logger.debug "Deck : #{deck.inspect}"
-     #logger.debug "Cards: #{deck[:cards]}"
-     table_deck = [] 
-     deck.size.times do
-       table_deck << deck.deal.to_s.gsub(/-/,"") .gsub(/'/," ")
-     end
-     
-     table = Table.new(:deck => table_deck, :pot => 0)
-     table.save
-     
-     
-     Player.all.each do |player|
-       Seat.create(:table_id => table.id, :player_id => player.id)
-       player.hand = []
-       player.save
-     end
-     
-     5.times do 
-       Player.all.each do |player|  
-         player.hand << table.deck.pop.to_s.gsub(/-/,"") .gsub(/'/," ")
-         logger.debug "hand: #{player.hand}"
-         player.save
-       end
-     end
-     
-     table.turn_id = table.seats.first.player_id
-     table.save
-  
-     respond_to do |format|
-       format.html { redirect_to display_path}
-     end
+    if player && verify_player_turn?(player) && params[:replacement]
+      if params[:replacement].to_i != 0 then player.replace_cards(params[:replacement]) end 
+      player.table.next_replacment
+    end
+      
+    respond_to do |format|
+      format.html {redirect_to display_path}
+    end
   end
-  
   
 end
