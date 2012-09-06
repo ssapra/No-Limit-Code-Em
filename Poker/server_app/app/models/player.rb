@@ -62,6 +62,7 @@ class Player < ActiveRecord::Base
   end
   
   def replace_cards(replace)
+    replace = replace.split("")
       array_of_discards = []
       if acceptable_replacement?(replace)
         replace.each do |index|
@@ -69,10 +70,15 @@ class Player < ActiveRecord::Base
         end
         self.hand-=array_of_discards
         array_of_discards.length.times do 
-          self.hand << self.table.deck.deal.pop
+          self.hand << self.table.deck.pop
         end
+        self.replacement = false
+        self.bet = 0
+        self.action = nil
+        self.save
       else
         self.in_round = false
+        self.save
       end
   end
   

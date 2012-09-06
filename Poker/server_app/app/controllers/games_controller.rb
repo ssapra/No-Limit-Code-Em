@@ -11,7 +11,7 @@ class GamesController < ApplicationController
     
     if player && verify_player_turn?(player) && params[:replacement]
       if params[:replacement].to_i != 0 then player.replace_cards(params[:replacement]) end 
-      player.table.next_replacment
+      player.table.next_replacement
     end
       
     respond_to do |format|

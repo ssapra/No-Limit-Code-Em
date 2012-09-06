@@ -22,6 +22,7 @@ class Table < ActiveRecord::Base
       seat.save
       player.seat_id = seat.id
       player.hand = []
+      player.replacement = false
       player.save
     end
      
@@ -57,7 +58,24 @@ class Table < ActiveRecord::Base
       
     if players_ready?
       logger.debug "PLAYERS READY"
+      self.next_replacement
     end
+  end
+  
+  def next_replacement
+    player = self.current_seat.player
+    if player.in_game && player.in_round
+      self.turn_id = player.id
+      self.save
+      player.replacement = true
+      player.save
+      logger.debug "Player Turn: #{Player.find_by_id(self.turn_id).name}"
+    end  
+    
+    if player == self.players.select {|player| player.in_round}.last
+      self.next_action
+    end
+    
   end
   
   def players_ready?

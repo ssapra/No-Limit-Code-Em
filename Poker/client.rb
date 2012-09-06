@@ -45,7 +45,14 @@ while player_key
   res = Net::HTTP.get_response(uri)
   answer = JSON.parse(res.body)
   
-  if answer["play"]
+  if answer["play"] && answer["replacement"]
+    puts "It's your turn."
+    puts "Your hand: #{answer["hand"]}"
+    print "Type which cards you want to replace. 0 for no replacement. "
+    player_response = gets.chomp
+    url = URI('http://localhost:3000/action')
+    response = Net::HTTP.post_form(url, {:name => name, :game_id => game_id, :replacement => player_response})
+  elsif answer["play"]  
     puts "It's your turn."
     puts "Your hand: #{answer["hand"]}"
     puts "There are #{answer["pot"]} chips in the pot."
