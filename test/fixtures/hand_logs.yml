@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  hand_id: 1
+  table_id: 1
+  players_ids: MyText
+  dealer_seat_id: 1
+
+two:
+  hand_id: 1
+  table_id: 1
+  players_ids: MyText
+  dealer_seat_id: 1

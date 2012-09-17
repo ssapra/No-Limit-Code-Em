@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  pot: 1
+  min_bet: 1
+  first_bet: false
+  second_bet: false
+  table_id: 1
+
+two:
+  pot: 1
+  min_bet: 1
+  first_bet: false
+  second_bet: false
+  table_id: 1

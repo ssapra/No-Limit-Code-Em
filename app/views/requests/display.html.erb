@@ -1,0 +1,23 @@
+<fieldset>
+		<legend><h1>Live Updates</h1></legend>
+    <h2>Players</h2>
+    <% if @players %>
+	  <% @players.each do |player| %>
+		<ul><%= player.name %> has connected</ul>
+	  <% end %>
+    <% else %>
+	  <h3>No Players</h3>
+    <% end %>
+</fieldset>
+
+<fieldset>
+  <legend>Admin Panel</legend>
+Registration is <%= status("registration") %>: <%= link_to "Toggle Registration", status_path(:type => "registration"), :method => :post %><br />
+
+Tables are <%= status("game") %>: <%= link_to "Toggle Game", status_path(:type => "game"), :method => :post %><br />
+
+<!-- Tournament is <%#= status("tournament") %>: <%#= link_to "Toggle Tournament", status_path(:type => "tournament"), :method => :post %><br /> -->
+
+<!-- Play is <%#= status("play") %>: <%#= link_to "Toggle Play", status_path(:type => "play"), :method => :post %><br /> -->
+
+</fieldset>
