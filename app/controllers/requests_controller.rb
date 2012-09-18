@@ -31,12 +31,34 @@ class RequestsController < ApplicationController
                 :play => true, 
                 :replacement => player.replacement,
                 :table_id => table.id}
-        actions = PlayerActionLog.find_all_by_round_id(round.id)
-        last_action = actions.last
-        if last_action == "bet" || last_action == "fold" || last_action == "check"
-          last_player = Player.find_by_id(last_action.player_id).name
-          body[:last_action] = "#{last_player last_action.action last_action.amount}"
+       
+        if round.second_bet then br_id = 2 else br_id = 1 end
+        actions = PlayerActionLog.find_all_by_betting_round_id_and_hand_id_and_action(br_id, round.id, ["check","bet","fold"])
+        body[:betting_summary] = actions.map do |action|
+          player = Player.find_by_id(action.player_id).name 
+          "#{player} #{action.action.pluralize} #{action.amount}"
         end
+        
+        
+        replacements = PlayerActionLog.find_all_by_hand_id_and_action(round.id, "replace")
+        body[:replacement_summary] = replacements.map do |action| 
+          player = Player.find_by_id(action.player_id).name
+          num_replaced = action.cards.split(" ").length
+          "#{player} replaced #{num_replaced} cards"
+        end
+        
+        
+        logs = HandLog.find_all_by_table_id(table.id)
+        if logs.length > 1 && round.second_bet == false
+          round_id = logs[logs.length - 2].hand_id
+          winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, "win")
+          body[:previous_winner] = winning_action.map do |action|
+            player = Player.find_by_id(action.player_id).name
+            "#{player} won #{action.amount} chips #{action.comment}"
+          end
+        end
+        
+        
       else 
         body = {:message => "It's NOT your turn", 
                 :play => false}

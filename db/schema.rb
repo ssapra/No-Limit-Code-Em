@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120917223205) do
+ActiveRecord::Schema.define(:version => 20120918172339) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
@@ -47,8 +47,9 @@ ActiveRecord::Schema.define(:version => 20120917223205) do
     t.integer  "amount"
     t.string   "cards"
     t.string   "comment"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+    t.integer  "betting_round_id"
   end
 
   create_table "player_state_logs", :force => true do |t|

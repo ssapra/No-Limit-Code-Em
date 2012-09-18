@@ -53,6 +53,9 @@ class Table < ActiveRecord::Base
       player.action = nil
       player.hand = []
       if player.stack == 0            # If player loses everything, in_game set to false, seat won't be called upon
+        PlayerActionLog.create(:hand_id => self.round.id,
+                               :player_id => player.id,
+                               :action => "lost")
         player.in_game = false
         player.in_round = false
       else

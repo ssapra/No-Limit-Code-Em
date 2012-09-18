@@ -36,7 +36,7 @@ class Player < ActiveRecord::Base
         self.bet = min_bet
         self.save
         round.save
-        PlayerActionLog.create(:hand_id => round.id, :player_id => self.id, :action => "check")
+        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "check")
       else
         self.action = "fold"
         self.in_round = false
@@ -53,7 +53,7 @@ class Player < ActiveRecord::Base
         self.bet = min_bet + bet
         self.save
         round.save
-        PlayerActionLog.create(:hand_id => round.id, :player_id => self.id, :action => "bet", :amount => bet)
+        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "bet", :amount => bet)
       else
         self.action = "fold"
         self.in_round = false
@@ -134,11 +134,19 @@ class Player < ActiveRecord::Base
     self.bet = 0
     self.save
   end
+  
+  def bettingid_check
+    if self.table.round.second_bet
+      return 2
+    else
+      return 1
+    end
+  end
    
   private 
   
   def fold_action_log
-    PlayerActionLog.create(:hand_id => self.table.round.id, :player_id => self.id, :action => "fold") 
+    PlayerActionLog.create(:hand_id => self.table.round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "fold") 
   end
   
 end
