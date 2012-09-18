@@ -43,7 +43,7 @@ class RequestsController < ApplicationController
         replacements = PlayerActionLog.find_all_by_hand_id_and_action(round.id, "replace")
         body[:replacement_summary] = replacements.map do |action| 
           player = Player.find_by_id(action.player_id).name
-          num_replaced = action.cards.split(" ").length
+          if action.cards then num_replaced = action.cards.split(" ").length else num_replaced = 0 end
           "#{player} replaced #{num_replaced} cards"
         end
         
