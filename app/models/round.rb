@@ -8,10 +8,9 @@ class Round < ActiveRecord::Base
                   
   belongs_to :table
   
-  
   def setup
     player_ids = self.players_in.map {|player| player.id}
-    log_players_states
+    log_player_state
     dealer_seat_id = self.set_dealer 
     HandLog.create(:hand_id => self.id, :table_id => table.id, :players_ids => player_ids.join(",").gsub(","," "), :dealer_seat_id => dealer_seat_id)
     self.ante_up
@@ -33,7 +32,6 @@ class Round < ActiveRecord::Base
     end
   end
   
-  
   def ante_up
     self.players_in.each do |player|
       if player.stack >= 20 then bet = 20 else bet = player.stack end
@@ -47,7 +45,6 @@ class Round < ActiveRecord::Base
                              :amount => bet)
     end
   end
-  
   
   def minimum_bet
     min_bet = 0
@@ -194,7 +191,7 @@ class Round < ActiveRecord::Base
   
   private
     
-    def log_players_states
+    def log_player_state
       self.players_in.each do |player|
         PlayerStateLog.create(:hand_id => self.id, :player_id => player.id, :chip_count => player.stack)
       end
