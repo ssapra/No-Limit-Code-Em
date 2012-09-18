@@ -31,9 +31,13 @@ class RequestsController < ApplicationController
                 :play => true, 
                 :replacement => player.replacement,
                 :table_id => table.id}
+        actions = PlayerActionLog.find_all_by_round_id(round.id)
+        last_action = actions.last
+        if last_action == "bet" || last_action == "fold" || last_action == "check"
+          last_player = Player.find_by_id(last_action.player_id).name
+          body[:last_action] = "#{last_player last_action.action last_action.amount}"
+        end
       else 
-        logger.debug "Table get request: #{player.table.inspect}"
-        # current_player = Player.find_by_id(player.table.turn_id)
         body = {:message => "It's NOT your turn", 
                 :play => false}
       end
