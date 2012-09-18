@@ -13,7 +13,7 @@ class Round < ActiveRecord::Base
     player_ids = self.players_in.map {|player| player.id}
     log_players_states
     dealer_seat_id = self.set_dealer 
-    HandLog.create(:hand_id => self.id, :table_id => table.id, :players_ids => player_ids, :dealer_seat_id => dealer_seat_id)
+    HandLog.create(:hand_id => self.id, :table_id => table.id, :players_ids => player_ids.join(",").gsub(","," "), :dealer_seat_id => dealer_seat_id)
     self.ante_up
     self.table.deal_cards
     self.table.save
@@ -25,11 +25,9 @@ class Round < ActiveRecord::Base
       seat = Player.find_by_id(self.table.dealer_id).seat
       next_seat = seat.next_seat
       self.table.update_attributes(:dealer_id => next_seat.player.id )        # Next dealer set up
-      logger.debug "TABLE INFO: #{self.table.inspect}"
       return next_seat.id
     else
       self.table.update_attributes(:dealer_id => self.players_in[0].id)     # First dealer is set at first player in array
-      logger.debug "TABLE INFO: #{self.table.inspect}"
       seat = Player.find_by_id(self.table.dealer_id).seat
       return seat.id
     end
@@ -68,8 +66,6 @@ class Round < ActiveRecord::Base
       seat = Player.find_by_id(self.table.turn_id).seat
       return seat.next_seat                       # If turn_id exists, next active player's seat is sent back
     else                                          # If there's already a dealer, the person left of the dealer starts betting
-      logger.debug "TABLE BEFORE FIRST PLAYER RETURNED: #{self.table.inspect}"
-      logger.debug "DEALER ID :#{self.table.dealer_id}"
       seat = Player.find_by_id(self.table.dealer_id).seat
       return seat.next_seat
     end
@@ -97,7 +93,7 @@ class Round < ActiveRecord::Base
       if player.action.nil? || player.bet != self.minimum_bet 
         self.table.turn_id = player.id
         self.table.save
-        logger.debug "Player Turn: #{Player.find_by_id(self.table.turn_id).name}"
+        logger.debug "Player Turn: #{player.name}"
       else                                 # If player is all good, move on to next player.
         self.next_action
       end
@@ -121,7 +117,7 @@ class Round < ActiveRecord::Base
       self.table.save
       player.replacement = true
       player.save
-      logger.debug "Replacement Turn: #{Player.find_by_id(self.turn_id).name}"
+      logger.debug "Replacement Turn: #{player.name}"
     end  
   end
   

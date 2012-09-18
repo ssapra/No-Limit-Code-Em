@@ -28,15 +28,15 @@ class Table < ActiveRecord::Base
     self.round.setup
   end
   
-  def deal_cards # Order the player array the right way to deal in right order
+  def deal_cards 
     player_ids = self.round.players_in.map {|player| player.id}
     dealer_position = player_ids.index(self.dealer_id)
     players = self.round.players_in
-    ordered_players = players.push(players.shift(dealer_position+1)).flatten
+    ordered_players = players.push(players.shift(dealer_position+1)).flatten   # Orders players based on dealer position
     5.times do 
-        ordered_players.each do |player|  
-        player.hand << self.deal
-        player.save!
+        ordered_players.each do |player|    
+          player.hand << self.deal
+          player.save!
       end
     end
     log_dealt_cards(ordered_players)
@@ -52,7 +52,7 @@ class Table < ActiveRecord::Base
       player.bet = 0
       player.action = nil
       player.hand = []
-      if player.stack == 0            # If player loses everything, in_game set to false
+      if player.stack == 0            # If player loses everything, in_game set to false, seat won't be called upon
         player.in_game = false
         player.in_round = false
       else
@@ -97,7 +97,7 @@ class Table < ActiveRecord::Base
     
     def log_dealt_cards(ordered_players)
       ordered_players.each do |player|
-        PlayerActionLog.create(:hand_id => self.id,
+        PlayerActionLog.create(:hand_id => self.round.id,
                                :player_id => player.id,
                                :action => "dealt",
                                :cards => player.hand.join(",").gsub(","," "))
