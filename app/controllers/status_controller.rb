@@ -8,6 +8,7 @@ class StatusController < ApplicationController
          status.save!
       else 
          status.registration = true
+         Player.destroy_all
          status.save!
       end
       respond_to do |format|
