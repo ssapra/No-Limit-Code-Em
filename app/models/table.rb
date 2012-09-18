@@ -5,7 +5,7 @@ class Table < ActiveRecord::Base
                   :turn_id, 
                   :min_bet, # Not being used anymore
                   :betting_round, # Not being used anymore
-                  :placeholder_id, # Not being used anymore
+                  :placeholder_id, # Not being used anymore, useless
                   :dealer_id
                   
   serialize :deck
