@@ -34,15 +34,26 @@ class Round < ActiveRecord::Base
   
   def ante_up
     self.players_in.each do |player|
-      if player.stack >= 20 then bet = 20 else bet = player.stack end
-      self.update_attributes(:pot => self.pot+=bet)   
-      player.stack-= bet
-      player.bet+= bet
-      player.save
-      PlayerActionLog.create(:hand_id => self.id,
+      if player.stack >= ServerApp::Application.config.ANTE
+        ante = ServerApp::Application.config.ANTE
+        self.update_attributes(:pot => self.pot+= ante)   
+        player.stack-= ante
+        player.bet+= ante
+        player.save
+        PlayerActionLog.create(:hand_id => self.id,
                              :player_id => player.id,
                              :action => "ante",
-                             :amount => bet)
+                             :amount => ante)
+      else
+        self.update_attributes(:pot => self.pot+= player.stack)   
+        player.stack-= player.stack
+        player.bet+= player.stack
+        player.save
+        PlayerActionLog.create(:hand_id => self.round.id,
+                               :player_id => player.id,
+                               :action => "lost",
+                               :comment => "could not match ante")
+      end                         
     end
   end
   
@@ -80,6 +91,7 @@ class Round < ActiveRecord::Base
       else
         logger.debug "STARTING REPLACEMENT"
         self.table.deck.deal                  # Burning one card before starting replacement
+        self.table.turn_id = nil              # Resets order to start with whoever started betting round
         self.table.save
         self.next_replacement
       end
@@ -109,7 +121,6 @@ class Round < ActiveRecord::Base
       self.next_action
     else    
       player = self.next_seat.player
-      # if self.deck.size <= 5
       self.table.turn_id = player.id
       self.table.save
       player.replacement = true
