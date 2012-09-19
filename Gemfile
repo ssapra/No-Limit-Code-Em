@@ -16,6 +16,11 @@ end
 gem 'devise'
 gem 'ruby-poker'
 
+group :test do
+  gem 'cucumber-rails', '~> 1.3.0', :require => false
+  gem 'rspec-rails', '~> 2.11.0'
+  gem 'database_cleaner'
+end
 
 # Gems used only for assets and not required
 # in production environments by default.
