@@ -60,7 +60,7 @@ class RequestsController < ApplicationController
           winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, "win")
           body[:previous_winner] = winning_action.map do |action|
             player_name = Player.find_by_id(action.player_id).name
-            "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{round.id}"
+            "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
           end
         end
         

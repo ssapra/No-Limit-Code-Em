@@ -38,7 +38,6 @@ class Round < ActiveRecord::Base
         ante = ServerApp::Application.config.ANTE
         self.update_attributes(:pot => self.pot+= ante)   
         player.stack-= ante
-        player.bet+= ante
         player.save
         PlayerActionLog.create(:hand_id => self.id,
                              :player_id => player.id,

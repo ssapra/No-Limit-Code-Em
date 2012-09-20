@@ -26,60 +26,35 @@ class Player < ActiveRecord::Base
   end
   
   def resolve_action(action, parameter)   # ALL BETTING VALIDATION LOGIC IS HERE
-    round = self.table.round
     min_bet = round.minimum_bet
     if action == 'check'
-      if min_bet == self.bet  
-        self.action = "check"
-        self.save
+      if min_bet == self.bet
+        save_player_action("check", 0, 0, 0)
         PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "check")
       else
-        self.action = "fold"
-        self.in_round = false
-        self.save
         raw_action_log(action, parameter)
         fold_action_log
       end
     elsif action == 'bet'
       bet = parameter.to_i
       if min_bet == self.bet && bet <= self.stack && bet <= smallest_stack
-        self.action = "bet"
-        self.stack-= bet
-        round.pot+= bet
-        self.bet+= bet
-        self.save
-        round.save
+        save_player_action("bet", bet, bet, bet)
         PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "bet", :amount => bet)
       elsif min_bet == self.bet && bet <= self.stack && bet > smallest_stack
         raw_action_log(action, parameter)
-        bet = largest_possible_bet
-        self.action = "bet"
-        self.stack-= bet
-        round.pot+= bet
-        self.bet+= bet
-        self.save
-        round.save
+        bet = smallest_stack
+        save_player_action("bet", bet, bet, bet)
         PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "bet", :amount => bet)
       else          
-        self.action = "fold"
-        self.in_round = false
-        self.save
         raw_action_log(action, parameter)
         fold_action_log
       end
     elsif action == 'call'
-      if min_bet - self.bet <= self.stack  
-        self.action = "call"
-        self.stack-= min_bet - self.bet
-        round.pot+= min_bet - self.bet
-        self.bet = min_bet
-        self.save
-        round.save
+      bet = min_bet - self.bet
+      if bet <= self.stack  
+        save_player_action("call", bet, bet, bet)
         PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "call")
       else
-        self.action = "fold"
-        self.in_round = false
-        self.save
         raw_action_log(action, parameter)
         fold_action_log
       end
@@ -87,40 +62,39 @@ class Player < ActiveRecord::Base
       bet = parameter.to_i
       # probably should have some validation that bet is not a string in the first place
       true_bet = bet + min_bet - self.bet
-      if min_bet != self.bet && true_bet <= self.stack && bet > 0 && true_bet <= smallest_stack
+      if min_bet != self.bet && true_bet <= self.stack && bet > 0 && bet <= smallest_stack
+        save_player_action("raise", true_bet, true_bet, true_bet)
+        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "raise", :amount => bet)
+      elsif min_bet != self.bet && true_bet <= self.stack && bet > 0 && bet > smallest_stack
+        raw_action_log(action, parameter)
+        bet = smallest_stack
         self.action = "raise"
-        self.stack-= true_bet
-        round.pot+= true_bet
-        self.bet = true_bet + self.bet
+        self.stack-= bet - self.bet    
+        round.pot+= bet + self.bet
+        self.bet = bet + min_bet
         self.save
         round.save
         PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "raise", :amount => bet)
-      elsif min_bet != self.bet && true_bet <= self.stack && bet > 0 && true_bet > smallest_stack
-        raw_action_log(action, parameter)
-        true_bet = smallest_stack
-        self.action = "raise"
-        self.stack-= true_bet + min_bet - self.bet
-        round.pot+= true_bet + min_bet - self.bet
-        self.bet = true_bet + min_bet
-        self.save
-        round.save
-        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "raise", :amount => true_bet + self.bet - min_bet)
       else
-        self.action = "fold"
-        self.in_round = false
-        self.save
         raw_action_log(action, parameter)
         fold_action_log
       end
     elsif action == "fold"
-      self.action = "fold"
-      self.in_round = false
-      self.save
       fold_action_log
     else
       raw_action_log(action, parameter)
       fold_action_log
     end
+  end
+  
+  def save_player_action(action, stack_change, pot_change, bet_change)
+    round = self.round
+    self.action = action
+    self.stack -= stack_change
+    round.pot += pot_change
+    self.bet += bet_change
+    self.save
+    round.save
   end
   
   def replace_cards(replace)      # ALL REPLACEMENT HAPPENS HERE
@@ -220,6 +194,9 @@ class Player < ActiveRecord::Base
   end
   
   def fold_action_log
+    self.action = "fold"
+    self.in_round = false
+    self.save
     PlayerActionLog.create(:hand_id => self.table.round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "fold") 
   end
   
