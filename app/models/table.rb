@@ -6,7 +6,8 @@ class Table < ActiveRecord::Base
                   :min_bet, # Not being used anymore
                   :betting_round, # Not being used anymore
                   :placeholder_id, # Not being used anymore, useless
-                  :dealer_id
+                  :dealer_id,
+                  :game_over
                   
   serialize :deck
   
@@ -57,42 +58,52 @@ class Table < ActiveRecord::Base
                                :player_id => player.id,
                                :action => "lost")
         player.in_game = false
+        player.seat.player_id = nil
         player.in_round = false
+        player.seat.save
+        # player.destroy
       else
         player.in_round = true        # Otherwise, back in the game baby...
+        player.replacement = false
+        player.save
       end
-      player.replacement = false
-      player.save
     end
     self.update_attributes(:deck => Deck.new)
     
     players_in_game = self.players.select {|player| player.in_game}
-    
-    # if players_in_game.count <= empty_seats || players_in_game.count == 1
-    #        logger.debug "We have a winner: #{players_in_game[0].name}"
-    #        if Status.first.waiting == false
-    #          # Status.first.waiting = true
-    #          # Reassign players now
-    #        else
-    #          while Status.first.waiting == true
-    #            if Status.first.waiting == false && players_in_game.count <= empty_seats
-    #               # Status.first.waiting = true
-    #               # Reassign more players
-    #            end
-    #          end
-    #        end
-    #     end
-         
-    if Status.first.waiting                   # Checks if tables are being reassigned
-      while(Status.first.waiting == true)     # Waits to start next hand
-        if Status.first.waiting == false
-          logger.debug "DEALING CARDS FOR NEXT ROUND"
-          self.begin_play
-        end
-      end
+    if players_in_game.count == 1
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => players_in_game[0].id,
+                             :action => "won",
+                             :comment => ". Table #{self.id} is closing now.")
+      self.update_attributes(:game_over => true)
     else
-      logger.debug "DEALING CARDS FOR NEXT ROUND"
-      self.begin_play
+      # if players_in_game.count <= empty_seats || players_in_game.count == 1
+      #        logger.debug "We have a winner: #{players_in_game[0].name}"
+      #        if Status.first.waiting == false
+      #          # Status.first.waiting = true
+      #          # Reassign players now
+      #        else
+      #          while Status.first.waiting == true
+      #            if Status.first.waiting == false && players_in_game.count <= empty_seats
+      #               # Status.first.waiting = true
+      #               # Reassign more players
+      #            end
+      #          end
+      #        end
+      #     end
+         
+      if Status.first.waiting                   # Checks if tables are being reassigned
+        while(Status.first.waiting == true)     # Waits to start next hand
+          if Status.first.waiting == false
+            logger.debug "DEALING CARDS FOR NEXT ROUND"
+            self.begin_play
+          end
+        end
+      else
+        logger.debug "DEALING CARDS FOR NEXT ROUND"
+        self.begin_play
+      end
     end
   end
   
