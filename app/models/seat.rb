@@ -13,7 +13,7 @@ class Seat < ActiveRecord::Base
         seat = Seat.find_by_id(seat.id + 1)       # Moves onto next seat
       end
       player = seat.player  
-      if player.in_game && player.in_round        # Checks if seat holds valid player
+      if player.in_game && player.in_round && player.stack != 0        # Checks if seat holds valid player
         logger.debug "FOUND NEXT PLAYER: #{player.name}"
         return seat
       end

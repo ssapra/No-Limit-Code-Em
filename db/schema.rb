@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120921105254) do
+ActiveRecord::Schema.define(:version => 20120923142301) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
@@ -78,6 +78,14 @@ ActiveRecord::Schema.define(:version => 20120921105254) do
     t.boolean  "replacement"
   end
 
+  create_table "pots", :force => true do |t|
+    t.integer  "total"
+    t.integer  "round_id"
+    t.text     "player_ids"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "rounds", :force => true do |t|
     t.integer  "pot"
     t.integer  "min_bet"
@@ -86,6 +94,7 @@ ActiveRecord::Schema.define(:version => 20120921105254) do
     t.integer  "table_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.integer  "side_pot"
   end
 
   create_table "seats", :force => true do |t|

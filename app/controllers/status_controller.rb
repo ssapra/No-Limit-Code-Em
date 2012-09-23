@@ -36,6 +36,7 @@ class StatusController < ApplicationController
          Table.all.each do |table|
            table.begin_play
          end
+         logger.debug "IM DONE"
          respond_to do |format|
            format.html { redirect_to display_path }
          end
