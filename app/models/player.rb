@@ -83,8 +83,8 @@ class Player < ActiveRecord::Base
         end
       elsif min_bet != self.bet && true_bet <= self.stack && bet > 0 && bet > smallest_stack
         raw_action_log(action, parameter)
-        bet = min_bet - smallest_stack
-        save_player_action("raise", bet - self.bet, bet + self.bet, bet + min_bet - self.bet)
+        bet = smallest_stack
+        save_player_action("raise", bet + min_bet - self.bet, bet + min_bet - self.bet, bet + min_bet - self.bet)
         if self.stack == 0
           player_action_log("raise", bet, "ALL IN")
         else
@@ -190,7 +190,7 @@ class Player < ActiveRecord::Base
   def smallest_stack
     smallest_stack = 10000
     self.table.round.players_in.each do |player|
-      if player.stack <= smallest_stack && player.stack != 0
+      if player.stack <= smallest_stack
         smallest_stack = player.stack
       end
     end
