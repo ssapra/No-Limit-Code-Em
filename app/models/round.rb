@@ -40,8 +40,15 @@ class Round < ActiveRecord::Base
         ids << player.id
       end
     end
-    Pot.create(:total => 0, :round_id => self.id, :player_ids => ids)
-    self.next_action
+    if ids.count == 1
+      self.determine_winner
+      self.reset_players
+    elsif self.anyone_is_all_in?
+      Pot.create(:total => 0, :round_id => self.id, :player_ids => ids)
+      self.next_action
+    else
+      self.next_action
+    end
   end
   
   def set_dealer
@@ -109,11 +116,13 @@ class Round < ActiveRecord::Base
     if self.players_in.count == 1                             
       logger.debug "ONLY 1 PLAYER LEFT"
       self.determine_winner
+      self.table.reset_players
     elsif self.players_ready?                   # Determines if players are ready for replacment or showdown
       logger.debug "PLAYERS READY"
       if self.second_bet
         logger.debug "DETERMINING WINNER"
         self.determine_winner
+        self.table.reset_players
       else
         logger.debug "STARTING REPLACEMENT"
         self.table.deck.deal                  # Burning one card before starting replacement
@@ -139,15 +148,18 @@ class Round < ActiveRecord::Base
     if self.players_in.count == 1         # If someone messes up replacement and only 1 person left, we stop                    
       logger.debug "ONLY 1 PLAYER LEFT"
       self.determine_winner
+      self.table.reset_players
     elsif self.finished_replacement?          # If everyone has their replacement attribute switched to true
       logger.debug "REPLACEMENT FINISHED"
       self.update_attributes(:second_bet => true)
       self.table.update_attributes(:turn_id => nil)
       self.replacement_finished                 # Replacement attribute set to false again
-      if all_but_one_in?
-        determine_winner  
+      if all_but_one_in? || all_in?
+        logger.debug "DETERMINING WINNER"
+        self.determine_winner
+        self.table.reset_players  
       else  
-        next_action
+        self.next_action
       end
     else    
       player = self.next_seat.player
@@ -174,8 +186,13 @@ class Round < ActiveRecord::Base
       player.replacement = false
       player.save
     end
-    if self.anyone_is_all_in?
-      player_ids = self.players_in.map {|player| if player.stack > 0 then return player.id end}
+    if self.anyone_is_all_in? && !self.all_but_one_in?
+      player_ids = []
+      self.players_in.each do |player| 
+        if player.stack > 0 
+          player_ids << player.id
+        end    
+      end  
       Pot.create(:total => 0, :player_ids => player_ids, :round_id => self.id)
     end
   end
@@ -183,46 +200,48 @@ class Round < ActiveRecord::Base
   def determine_winner
     self.table.turn_id = nil                                  # Nobody's turn now. 
     self.save
-    self.players_in.each do |player|
-      player.change_hand_to_PokerHand
-      logger.debug "#{player.name}'s hand: #{player.hand}"
-    end
-    if self.pots.count == 2
-      
-    else
-      winner = self.players_in.max {|a,b| a.hand <=> b.hand }      # Find best hand
-      winners = []  
-      self.players_in.each do |player|                             # Find everyone who ties the best hand
-        if player.hand == winner.hand then winners << player end                  
-      end
+    
+    self.pots.reverse.each do |pot|
+      winners = find_winners(pot.player_ids)
       
       if winners.count == 1
-          logger.debug "#{winners[0].name} has won this round with #{winners[0].hand}."
-          logger.debug "#{winners[0].name} wins #{pot} chips"
-          winner.stack+= self.pot
+        logger.debug "#{winners[0].name} has won this round with #{winners[0].hand}."
+        logger.debug "#{winners[0].name} wins #{pot.total} chips"
+        winners[0].stack += pot.total
+        winners[0].save
+          
+        PlayerActionLog.create(:hand_id => self.id,
+                               :player_id => winners[0].id,
+                               :action => "win",                                 
+                               :amount => pot.total,
+                               :comment => "with #{winners[0].hand}")
+      else 
+        division = winners.count
+        logger.debug  "The pot is split #{division}-way."
+        winners.each do |winner|  # NEED TO REMEMBER TO KEEP EXTRA CHIPS IN POT FOR NEXT ROUND
+          winner.stack += self.pot/division 
           winner.save
           
           PlayerActionLog.create(:hand_id => self.id,
-                                 :player_id => winner.id,
-                                 :action => "win",
-                                 :amount => self.pot,
-                                 :comment => "with #{winner.hand.rank}")
-      else 
-          division = winners.count
-          logger.debug  "The pot is split #{division}-way."
-          winners.each do |winner|
-          logger.debug  "#{winner.name} takes #{pot/division} with #{winner.hand}"  # NEED TO REMEMBER TO KEEP EXTRA CHIPS IN POT FOR NEXT ROUND
-          winner.stack+= self.pot/division 
-          winner.save
-          PlayerActionLog.create(:hand_id => self.id,
-                                 :player_id => winner.id,
-                                 :action => "win",
-                                 :amount => self.pot/division,
-                                 :comment => "with #{winner.hand.rank}")         
-          end
+                               :player_id => winner.id,
+                               :action => "win",
+                               :amount => self.pot/division,
+                               :comment => "with #{winner.hand}")         
+        end
       end
+      
     end
-      self.table.reset_players
+    logger.debug "players: #{self.players_in.inspect}"
+  end
+  
+  def find_winners(player_ids)
+    players = player_ids.map {|id| Player.find_by_id(id)}
+    winner = players.max {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand
+    winners = []  
+    players.each do |player|                             # Find everyone who ties the best hand
+      if PokerHand.new(player.hand) == PokerHand.new(winner.hand) then winners << player end                  
+    end
+    return winners
   end
   
   def players_in
@@ -247,6 +266,14 @@ class Round < ActiveRecord::Base
       end
     end
     false
+  end
+  
+  def all_in?
+   all_in_player_count = 0
+    self.players_in.each do |player|
+      if player.stack == 0 then all_in_player_count+=1 end
+    end
+    if all_in_player_count == self.players_in.count then return true else return false end
   end
   
   def all_but_one_in?

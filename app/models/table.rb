@@ -48,11 +48,14 @@ class Table < ActiveRecord::Base
   end
   
   def reset_players                   # Called after a winner has been declared
-    players = self.players.select {|player| player.in_game}
-    players.each do |player|
+    @players = self.players.select {|player| player.in_game}
+    logger.debug "players: #{players.inspect}"
+    @players.each do |player|
+      player.reload
       player.bet = 0
       player.action = nil
       player.hand = []
+      logger.debug "Player: #{player.inspect}"
       if player.stack == 0          # If player loses everything, in_game set to false, seat won't be called upon
         PlayerActionLog.create(:hand_id => self.round.id,
                                :player_id => player.id,
@@ -61,6 +64,7 @@ class Table < ActiveRecord::Base
         player.seat.player_id = nil
         player.in_round = false
         player.seat.save
+        player.save
         # player.destroy
       else
         player.in_round = true        # Otherwise, back in the game baby...

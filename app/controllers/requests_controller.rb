@@ -27,7 +27,7 @@ class RequestsController < ApplicationController
         if table.game_over
           logs = HandLog.find_all_by_table_id(table.id)
           # round_id = logs[logs.length - 2].hand_id
-          previous_round = logs[logs.length - 2].hand_id
+          previous_round = logs[logs.length - 1].hand_id
           winning_action = PlayerActionLog.find_all_by_hand_id_and_action(previous_round, "win")
           body[:table_winner] = winning_action.map do |action|
             player_name = Player.find_by_id(action.player_id).name
