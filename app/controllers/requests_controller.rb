@@ -23,8 +23,8 @@ class RequestsController < ApplicationController
       if player
         table = player.table
         round = table.round
+        body = {}
         if table.game_over
-          body = {}
           logs = HandLog.find_all_by_table_id(table.id)
           # round_id = logs[logs.length - 2].hand_id
           previous_round = logs[logs.length - 2].hand_id
@@ -35,15 +35,16 @@ class RequestsController < ApplicationController
           end
           body[:table_winner] << "#{Player.find_by_id(winning_action[0].player_id).name} won. Game is over."
         else
-          if table.turn_id then current_player = Player.find_by_id(table.turn_id) end
-          body = {:current_player => current_player.name,
-                  :hand => player.hand, 
-                  :bet => player.bet, 
-                  :min_bet => round.minimum_bet, 
-                  :stack => player.stack, 
-                  :pot => round.pot, 
-                  :replacement => current_player.replacement,
-                  :table_id => table.id}
+          if table.turn_id 
+            current_player = Player.find_by_id(table.turn_id)
+            body.merge!({:current_player => current_player.name, :replacement => current_player.replacement})
+          end
+          body.merge!({:hand => player.hand, 
+                     :bet => player.bet, 
+                     :min_bet => round.minimum_bet, 
+                     :stack => player.stack, 
+                     :pot => round.total_pot, 
+                     :table_id => table.id})
        
           if round.second_bet then br_id = 2 else br_id = 1 end
           # actions = PlayerActionLog.find_all_by_betting_round_id_and_hand_id_and_action(br_id, round.id, ["check","bet","fold"])
@@ -82,6 +83,8 @@ class RequestsController < ApplicationController
           else 
             body[:play] = false
           end
+          
+          logger.debug "Body : #{body.inspect}"
         end
         
       else 

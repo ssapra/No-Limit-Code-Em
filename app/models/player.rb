@@ -30,7 +30,7 @@ class Player < ActiveRecord::Base
     if action == 'check'
       if min_bet == self.bet
         save_player_action("check", 0, 0, 0)
-        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "check")
+        player_action_log("check", nil, nil)
       else
         raw_action_log(action, parameter)
         fold_action_log
@@ -39,12 +39,20 @@ class Player < ActiveRecord::Base
       bet = parameter.to_i
       if min_bet == self.bet && bet <= self.stack && bet <= smallest_stack
         save_player_action("bet", bet, bet, bet)
-        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "bet", :amount => bet)
+        if self.stack == 0
+          player_action_log("bet", bet, "ALL IN")
+        else
+          player_action_log("bet", bet, nil)
+        end  
       elsif min_bet == self.bet && bet <= self.stack && bet > smallest_stack
         raw_action_log(action, parameter)
         bet = smallest_stack
         save_player_action("bet", bet, bet, bet)
-        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "bet", :amount => bet)
+        if self.stack == 0
+          player_action_log("bet", bet, "ALL IN")
+        else
+          player_action_log("bet", bet, nil)
+        end
       else          
         raw_action_log(action, parameter)
         fold_action_log
@@ -53,7 +61,11 @@ class Player < ActiveRecord::Base
       bet = min_bet - self.bet
       if bet <= self.stack  
         save_player_action("call", bet, bet, bet)
-        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "call")
+        if self.stack == 0
+          player_action_log("call", bet, "ALL IN")
+        else
+          player_action_log("bet", bet, nil)
+        end
       else
         raw_action_log(action, parameter)
         fold_action_log
@@ -64,17 +76,20 @@ class Player < ActiveRecord::Base
       true_bet = bet + min_bet - self.bet
       if min_bet != self.bet && true_bet <= self.stack && bet > 0 && bet <= smallest_stack
         save_player_action("raise", true_bet, true_bet, true_bet)
-        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "raise", :amount => bet)
+        if self.stack == 0
+          player_action_log("raise", bet, "ALL IN")
+        else
+          player_action_log("raise", bet, nil)
+        end
       elsif min_bet != self.bet && true_bet <= self.stack && bet > 0 && bet > smallest_stack
         raw_action_log(action, parameter)
-        bet = smallest_stack
-        self.action = "raise"
-        self.stack-= bet - self.bet    
-        round.pot+= bet + self.bet
-        self.bet = bet + min_bet
-        self.save
-        round.save
-        PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "raise", :amount => bet)
+        bet = min_bet - smallest_stack
+        save_player_action("raise", bet - self.bet, bet + self.bet, bet + min_bet - self.bet)
+        if self.stack == 0
+          player_action_log("raise", bet, "ALL IN")
+        else
+          player_action_log("raise", bet, nil)
+        end
       else
         raw_action_log(action, parameter)
         fold_action_log
@@ -88,13 +103,13 @@ class Player < ActiveRecord::Base
   end
   
   def save_player_action(action, stack_change, pot_change, bet_change)
-    round = self.round
+    pot = self.round.pot
     self.action = action
     self.stack -= stack_change
-    round.pot += pot_change
+    pot.total += pot_change
     self.bet += bet_change
     self.save
-    round.save
+    pot.save
   end
   
   def replace_cards(replace)      # ALL REPLACEMENT HAPPENS HERE
@@ -175,7 +190,7 @@ class Player < ActiveRecord::Base
   def smallest_stack
     smallest_stack = 10000
     self.table.round.players_in.each do |player|
-      if player.stack <= smallest_stack
+      if player.stack <= smallest_stack && player.stack != 0
         smallest_stack = player.stack
       end
     end
@@ -191,6 +206,10 @@ class Player < ActiveRecord::Base
                            :action => raw_action, 
                            :amount => raw_parameter,
                            :comment => "Invalid Action")
+  end
+  
+  def player_action_log(action, bet, comment)
+    PlayerActionLog.create(:hand_id => round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => action, :amount => bet, :comment => comment)
   end
   
   def fold_action_log
