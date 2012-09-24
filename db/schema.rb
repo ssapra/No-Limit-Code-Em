@@ -64,9 +64,9 @@ ActiveRecord::Schema.define(:version => 20120923142301) do
     t.integer  "game_id"
     t.string   "name"
     t.string   "player_key"
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
-    t.text     "hand",        :default => "'--- []\n'"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.text     "hand",        :default => "'"
     t.integer  "bet",         :default => 0
     t.integer  "stack",       :default => 500
     t.string   "action"
