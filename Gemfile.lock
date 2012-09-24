@@ -169,6 +169,7 @@ DEPENDENCIES
   jquery-rails
   pg
   rails (= 3.2.8)
+  rspec-mocks
   rspec-rails (~> 2.11.0)
   ruby-poker
   sass-rails (~> 3.2.3)
