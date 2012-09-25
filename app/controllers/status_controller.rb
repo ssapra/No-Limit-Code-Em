@@ -26,17 +26,18 @@ class StatusController < ApplicationController
            format.html { redirect_to display_path }
          end
       else 
-         status.game = true
-         status.save!
          Table.destroy_all
          PlayerActionLog.destroy_all
          HandLog.destroy_all
          PlayerStateLog.destroy_all
-         setup_tables
-         Table.all.each do |table|
-           table.begin_play
+         if Player.all.count > 2
+           setup_tables
+           Table.all.each do |table|
+             table.begin_play
+           end
+           status.game = true
+           status.save!
          end
-         logger.debug "IM DONE"
          respond_to do |format|
            format.html { redirect_to display_path }
          end
