@@ -26,11 +26,10 @@ class StatusController < ApplicationController
            format.html { redirect_to display_path }
          end
       else 
-         Table.destroy_all
          PlayerActionLog.destroy_all
          HandLog.destroy_all
          PlayerStateLog.destroy_all
-         if Player.all.count > 2
+         if Player.all.count > 1
            setup_tables
            Table.all.each do |table|
              table.begin_play
