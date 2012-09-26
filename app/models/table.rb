@@ -98,7 +98,7 @@ class Table < ActiveRecord::Base
           Status.first.update_attributes(:waiting => false)
         end
       end
-    elsif players_in_game == 1 && Table.all.count == 1
+    elsif players_in_game.count == 1 && Table.all.count == 1
       logger.debug ("GAME OVER")
       PlayerActionLog.create(:hand_id => self.round.id,
                              :player_id => players_in_game[0].id,

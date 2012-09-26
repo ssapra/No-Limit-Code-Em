@@ -1,5 +1,5 @@
 require 'spec_helper'
-# include TableManager
+include TableManager
 
 describe TableManager do
   
