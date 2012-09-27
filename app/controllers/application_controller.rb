@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
                 :verify_player_turn?,
                 :setup_tables,
                 :empty_seats
-            
   protected
   
   def empty_seats
