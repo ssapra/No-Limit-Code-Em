@@ -42,7 +42,7 @@ class Round < ActiveRecord::Base
     end
     if ids.count == 1
       self.determine_winner
-      self.reset_players
+      self.table.reset_players
     elsif self.anyone_is_all_in?
       Pot.create(:total => 0, :round_id => self.id, :player_ids => ids)
       self.next_action

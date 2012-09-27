@@ -216,6 +216,10 @@ class Player < ActiveRecord::Base
     self.action = "fold"
     self.in_round = false
     self.save
+    self.round.pots.each do |pot|
+      pot.player_ids.delete(self.id)
+      pot.save
+    end
     PlayerActionLog.create(:hand_id => self.table.round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "fold") 
   end
   

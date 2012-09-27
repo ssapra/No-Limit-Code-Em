@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   include RubyPoker
+  include TableManager
+  # require 'table_manager.rb'
   helper_method :respond_to_request,
                 :verify_player_turn?,
                 :setup_tables,
@@ -42,7 +44,7 @@ class ApplicationController < ActionController::Base
         if Status.first.registration
           body = {:message => "You have already registered. Registration is closed. Waiting for game to begin."}
         elsif Status.first.game
-          body = {:message => "It might be your turn. We're still working on it."}
+          body = {:message => "It might be your turn."}
         else
           body = {:message => "Registration is closed. Waiting for game to begin."}
         end
@@ -66,27 +68,18 @@ class ApplicationController < ActionController::Base
   end
   
   def setup_tables
-    players = Player.all
-    num_of_tables = (players.count / 6)
-    
-    num_of_tables.times do |index|
+    logger.debug "REACHED TABLES"
+    Table.destroy_all
+    player_ids = Player.all.map {|player| player.id if player.in_game}
+    logger.debug "ids: #{player_ids}"
+    table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE)
+    logger.debug "#{table_list}"
+    table_list.each do |players|
       table = Table.create(:deck => Deck.new)
-     
-      players[index*6..6*index+5].each do |player|
-        seat = Seat.create(:table_id => table.id, :player_id => player.id)
-        player.update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
+      players.each do |id|
+        seat = Seat.create(:table_id => table.id, :player_id => id)
+        Player.find_by_id(id).update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
       end
-    end
-    
-    extras = players.count % 6
-    num_seated = num_of_tables * 6
-    extra_players = players[num_seated..num_seated + extras - 1] 
-    
-    table = Table.create(:deck => Deck.new)
-   
-    extra_players.each do |player|
-      seat = Seat.create(:table_id => table.id, :player_id => player.id)
-      player.update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
     end
   end
   
