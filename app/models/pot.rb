@@ -6,7 +6,7 @@ class Pot < ActiveRecord::Base
   belongs_to :round
   
   def players
-    self.player_ids.map {|id| Player.find_by_id(id)}
+    return self.player_ids.map {|id| Player.find_by_id(id)}
     logger.debug "Players from pot: #{self.player_ids.map {|id| Player.find_by_id(id)}}"
   end
 end

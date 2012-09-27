@@ -13,6 +13,8 @@ class Seat < ActiveRecord::Base
         seat = Seat.find_by_id(seat.id + 1)       # Moves onto next seat
       end
       player = seat.player  
+      player.reload
+      logger.debug "Looking at player: #{player.name}"
       if player.in_game && player.in_round       # Checks if seat holds valid player
         logger.debug "FOUND NEXT PLAYER: #{player.name}"
         return seat

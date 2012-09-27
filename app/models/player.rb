@@ -148,8 +148,13 @@ class Player < ActiveRecord::Base
                                :cards => temp_hand.join(",").gsub(","," "))
         reset_after_replacement                              # Sets action to nil, bet to 0, replacement to true
       else
+        PlayerActionLog.create(:hand_id => round.id,
+                               :player_id => self.id,
+                               :comment => "Invalid Replacement")
+        self.reload
         self.in_round = false
         self.save
+        self.remove_from_pot
       end
     end
   end
@@ -189,12 +194,19 @@ class Player < ActiveRecord::Base
   
   def smallest_stack
     smallest_stack = 10000
-    self.table.round.players_in.each do |player|
+    self.round.pot.players.each do |player|
       if player.stack <= smallest_stack
         smallest_stack = player.stack
       end
     end
     return smallest_stack
+  end
+  
+  def remove_from_pot
+    self.round.pots.each do |pot|
+      pot.player_ids.delete(self.id)
+      pot.save
+    end
   end
    
   private 
@@ -216,10 +228,7 @@ class Player < ActiveRecord::Base
     self.action = "fold"
     self.in_round = false
     self.save
-    self.round.pots.each do |pot|
-      pot.player_ids.delete(self.id)
-      pot.save
-    end
+    self.remove_from_pot
     PlayerActionLog.create(:hand_id => self.table.round.id, :betting_round_id => self.bettingid_check, :player_id => self.id, :action => "fold") 
   end
   

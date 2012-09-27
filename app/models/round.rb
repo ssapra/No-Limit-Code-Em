@@ -92,7 +92,7 @@ class Round < ActiveRecord::Base
   
   def minimum_bet
     min_bet = 0
-    self.players_in.each do |player|
+    self.pot.players.each do |player|
       if player.bet > min_bet # Checks the bets of players who have bet
           min_bet = player.bet
       end 
@@ -133,12 +133,12 @@ class Round < ActiveRecord::Base
     else 
       logger.debug "BETTING CONTINUES"
       player = self.next_seat.player        # Finds next player who is in the game
-      
+      player.reload
       if (player.action.nil? || player.bet != self.minimum_bet) && player.stack != 0
         self.table.turn_id = player.id
         self.table.save
         logger.debug "Player Turn: #{player.name}"
-      else                                 # If player is all good, move on to next player.
+      else                                 # If player is all good or all in, move on to next player.
         self.next_action
       end
     end  
@@ -251,7 +251,7 @@ class Round < ActiveRecord::Base
   def players_ready?
     min_bet = self.minimum_bet                  # Minimum bet re-checked
 
-    self.players_in.each do |player|
+    self.pot.players.each do |player|
       if (player.action.nil? || player.bet != min_bet)    # Checks if player has done something and match the minimum 
         return false                          # NEED TO CONSIDER IF THEY ARE ALL IN
       end
