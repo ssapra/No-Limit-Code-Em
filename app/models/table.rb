@@ -72,23 +72,27 @@ class Table < ActiveRecord::Base
       end
     end
     self.update_attributes(:deck => Deck.new)
-    Player.all.each do |player|
-      player.reload
-    end
+    
     logger.debug "CHECKPOINT"
-    players_in_game = self.players.map {|player| player.id if player.in_game}
-    logger.debug "Players in game: #{players_in_game.count}"
+    count_of_players = 0
+    self.players.each do |player|
+      player.reload
+      if player.in_game
+        count_of_players+=1
+      end
+    end
+    logger.debug "Players in game: #{count_of_players}"
     status = Status.first
     status.reload
-     if Status.first.waiting
-       while(Status.first.waiting)
-         Status.first.reload
-         if Status.first.waiting == false 
-            logger.debug "DEALING CARDS FOR NEXT ROUND"
-            self.begin_play
-         end
-       end
-    elsif (players_in_game.count == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1)
+      if Status.first.waiting == true
+        while(Status.first.waiting)
+          Status.first.reload
+            if Status.first.waiting == false 
+              logger.debug "DEALING CARDS FOR NEXT ROUND"
+              self.begin_play
+            end
+        end
+      elsif (count_of_players == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1)
       logger.debug "setup tables"
       status = Status.first
       status.update_attributes(:waiting => true)
@@ -98,13 +102,14 @@ class Table < ActiveRecord::Base
           Status.first.update_attributes(:waiting => false)
         end
       end
-    elsif players_in_game.count == 1 && Table.all.count == 1
+    elsif count_of_players == 1 && Table.all.count == 1
       logger.debug ("GAME OVER")
       PlayerActionLog.create(:hand_id => self.round.id,
-                             :player_id => players_in_game[0].id,
+                             :player_id => Player.find_by_in_game(true).id,
                              :action => "won",
                              :comment => ". Tournament is over")
-      #self.find_winners
+      self.find_winners
+      Status.first.update_attributes(:game => false)
     else
       logger.debug "DEALING CARDS FOR NEXT ROUND"
       self.begin_play
@@ -126,8 +131,31 @@ class Table < ActiveRecord::Base
       
   
   def find_winners
+    first_place = Player.find_by_in_game(true)
+    third_place_log = find_last_hand(3)
+    second_place_log = find_last_hand(2)
+    if third_place_log != second_place_log # true if 4 then 2, or 4 then 1
+      if second_place_log != nil # false if 4 then 1
+        log = second_place_log.players_ids.split(" ")
+        log.delete(first_place.id.to_s)
+        second_place = Player.find_by_id(log[0])
+        logger.debug "Second Place: #{second_place.name}"
+      end
+    end
     
     
+    logger.debug "First Place: #{first_place.name}"
+    
+  end
+  
+  def find_last_hand(number_of_players)
+    round_ids = self.rounds.pluck(:id)
+    for round_id in round_ids.reverse
+      log = HandLog.find_by_hand_id(round_id)
+      if log.players_ids.split(" ").count >= number_of_players
+        return log
+      end
+    end
   end
   
   def multiple_tables?
