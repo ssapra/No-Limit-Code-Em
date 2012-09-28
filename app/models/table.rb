@@ -54,7 +54,6 @@ class Table < ActiveRecord::Base
       player.reload
       player.bet = 0
       player.action = nil
-      player.hand = []
       if player.stack == 0          # If player loses everything, in_game set to false, seat won't be called upon
         PlayerActionLog.create(:hand_id => self.round.id,
                                :player_id => player.id,
@@ -66,6 +65,7 @@ class Table < ActiveRecord::Base
         player.save
         # player.destroy
       else
+        player.hand = []
         player.in_round = true        # Otherwise, back in the game baby...
         player.replacement = false
         player.save
@@ -134,15 +134,27 @@ class Table < ActiveRecord::Base
     first_place = Player.find_by_in_game(true)
     third_place_log = find_last_hand(3)
     second_place_log = find_last_hand(2)
-    if third_place_log != second_place_log # true if 4 then 2, or 4 then 1
-      if second_place_log != nil # false if 4 then 1
-        log = second_place_log.players_ids.split(" ")
-        log.delete(first_place.id.to_s)
-        second_place = Player.find_by_id(log[0])
-        logger.debug "Second Place: #{second_place.name}"
+    if third_place_log != second_place_log # true if (X - 3 - 2 - 1) or (X - 2 - 1) or (2 - 1)
+      # if second_place_log != nil # (X - )
+      if third_place_log
+        loser_logs = PlayerActionLog.find_all_by_action_and_hand_id("lost", third_place_log.hand_id)
+        loser_ids = loser_logs.map{|log| log.player_id}
+        players = loser_ids.map {|id| Player.find_by_id(id)}
+        winner = players.max {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand of the losers
+        logger.debug "Third Place: #{winner.name}"
       end
+      log = second_place_log.players_ids.split(" ")
+      log.delete(first_place.id.to_s)
+      second_place = Player.find_by_id(log[0])
+      logger.debug "Second Place: #{second_place.name}"
+    else
+      loser_logs = PlayerActionLog.find_all_by_action_and_hand_id("lost", third_place_log.hand_id)
+      loser_ids = loser_logs.map{|log| log.player_id}
+      players = loser_ids.map {|id| Player.find_by_id(id)}
+      ordered_losers = players.sort {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand of the losers
+      logger.debug "Third Place: #{ordered_losers[1].name}"
+      logger.debug "Second Place: #{ordered_losers[0].name}"
     end
-    
     
     logger.debug "First Place: #{first_place.name}"
     
@@ -156,6 +168,7 @@ class Table < ActiveRecord::Base
         return log
       end
     end
+    return nil
   end
   
   def multiple_tables?

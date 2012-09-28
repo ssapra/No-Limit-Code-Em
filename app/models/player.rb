@@ -149,6 +149,7 @@ class Player < ActiveRecord::Base
         reset_after_replacement                              # Sets action to nil, bet to 0, replacement to true
       else
         PlayerActionLog.create(:hand_id => round.id,
+                               :action => "fold",
                                :player_id => self.id,
                                :comment => "Invalid Replacement")
         self.reload
