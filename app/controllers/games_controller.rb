@@ -8,11 +8,11 @@ class GamesController < ApplicationController
       if player.replacement == false
         logger.debug "RECEIVED PLAYER ACTION"
         player.resolve_action(params[:player_action], params[:parameters])
-        player.table.round.next_action
+        player.round.next_action
       elsif player.replacement && params[:player_action] == "replacement" 
         logger.debug "REPLACEMENT RECEIVED"
         player.replace_cards(params[:parameters]) 
-        player.table.round.next_replacement
+        player.round.next_replacement
       end
     end
       

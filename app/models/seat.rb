@@ -4,7 +4,7 @@ class Seat < ActiveRecord::Base
   belongs_to :table
   has_one :player
   
-  def next_seat
+  def next_seat(action)
     seat = self
     while(true)
       if seat == seat.table.seats.last            # Changes pointer to first seat if at last seat
@@ -15,9 +15,11 @@ class Seat < ActiveRecord::Base
       player = seat.player  
       player.reload
       logger.debug "Looking at player: #{player.name}"
-      if player.in_game && player.in_round       # Checks if seat holds valid player
+      if player.in_game && player.in_round
+        if action == "bet" && player.stack != 0 || action == "replace"       # Checks if seat holds valid player
         logger.debug "FOUND NEXT PLAYER: #{player.name}"
         return seat
+        end
       end
     end
   end
