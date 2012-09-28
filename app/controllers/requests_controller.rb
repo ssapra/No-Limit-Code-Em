@@ -98,28 +98,26 @@ class RequestsController < ApplicationController
             body[:play] = false
           end
           
-          
-          
           logger.debug "Body : #{body.inspect}"
-        else 
-          body = {:message => "You are out.", :play => false}
+        else
+           first = PlayerActionLog.find_by_comment("First")
+           logger.debug "First exists: #{first}"
+           body = {:message => "You're out"}
         end
       end
-    else
-      first = PlayerActionLog.find_by_comment("First")
-      logger.debug "#{first}"
-      # if first != nil
-      #         logs = PlayerActionLog.find_all_by_action("won")
-      #         logs.sort! {|a,b| a.comment <=> b.comment}
-      #         winners = logs.map do |log|
-      #           winner = Player.find_by_id(log.player_id)
-      #           "#{winner.name} won #{log.comment.lowercase} place!"
-      #         end
-      #           
-      #         body = {:message => "GAME OVER", :winners => winners}
-      #       else
-      #         body = {:message => "Game hasn't started yet"}
-      #       end
+    else 
+       body = {:message => "Game hasn't started yet"}
+        # if first != nil
+        #         logs = PlayerActionLog.find_all_by_action("won")
+        #         logs.sort! {|a,b| a.comment <=> b.comment}
+        #         winners = logs.map do |log|
+        #           winner = Player.find_by_id(log.player_id)
+        #           "#{winner.name} won #{log.comment.lowercase} place!"
+        #         end
+        #           
+        #         body = {:message => "GAME OVER", :winners => winners}
+        #       else
+        #       end
     end
   
     respond_to do |format|
