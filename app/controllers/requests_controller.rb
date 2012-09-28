@@ -44,12 +44,13 @@ class RequestsController < ApplicationController
             body.merge!({:current_player => current_player.name, :replacement => current_player.replacement})
           end
           
+          smallest_stack = player.smallest_stack
           
           body.merge!({:hand => player.hand, 
                      :bet => player.bet, 
                      :min_bet => round.minimum_bet,
-                     :max_bet => player.smallest_stack,
-                     :max_raise => [player.smallest_stack, player.smallest_stack - (round.minimum_bet - player.bet)].max, 
+                     :max_bet => smallest_stack,
+                     :max_raise => [player.stack - (round.minimum_bet - player.bet), smallest_stack].min,
                      :stack => player.stack, 
                      :pot => round.total_pot, 
                      :table_id => table.id})
@@ -105,7 +106,20 @@ class RequestsController < ApplicationController
         end
       end
     else
-      body = {:message => "Game hasn't started yet."}
+      first = PlayerActionLog.find_by_comment("First")
+      logger.debug "#{first}"
+      # if first != nil
+      #         logs = PlayerActionLog.find_all_by_action("won")
+      #         logs.sort! {|a,b| a.comment <=> b.comment}
+      #         winners = logs.map do |log|
+      #           winner = Player.find_by_id(log.player_id)
+      #           "#{winner.name} won #{log.comment.lowercase} place!"
+      #         end
+      #           
+      #         body = {:message => "GAME OVER", :winners => winners}
+      #       else
+      #         body = {:message => "Game hasn't started yet"}
+      #       end
     end
   
     respond_to do |format|

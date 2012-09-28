@@ -107,7 +107,7 @@ class Table < ActiveRecord::Base
       PlayerActionLog.create(:hand_id => self.round.id,
                              :player_id => Player.find_by_in_game(true).id,
                              :action => "won",
-                             :comment => ". Tournament is over")
+                             :comment => "First")
       self.find_winners
       Status.first.update_attributes(:game => false)
     else
@@ -141,22 +141,38 @@ class Table < ActiveRecord::Base
         loser_ids = loser_logs.map{|log| log.player_id}
         players = loser_ids.map {|id| Player.find_by_id(id)}
         winner = players.max {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand of the losers
-        logger.debug "Third Place: #{winner.name}"
+        PlayerActionLog.create(:hand_id => self.round.id,
+                               :player_id => winner.id,
+                               :action => "won",
+                               :comment => "Third")
+        # logger.debug "Third Place: #{winner.name}"
       end
       log = second_place_log.players_ids.split(" ")
       log.delete(first_place.id.to_s)
       second_place = Player.find_by_id(log[0])
-      logger.debug "Second Place: #{second_place.name}"
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => second_place.id,
+                             :action => "won",
+                             :comment => "Second")
+      # logger.debug "Second Place: #{second_place.name}"
     else
       loser_logs = PlayerActionLog.find_all_by_action_and_hand_id("lost", third_place_log.hand_id)
       loser_ids = loser_logs.map{|log| log.player_id}
       players = loser_ids.map {|id| Player.find_by_id(id)}
       ordered_losers = players.sort {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand of the losers
-      logger.debug "Third Place: #{ordered_losers[1].name}"
-      logger.debug "Second Place: #{ordered_losers[0].name}"
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => order_losers[1].id,
+                             :action => "won",
+                             :comment => "Third")
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => order_losers[0].id,
+                             :action => "won",
+                             :comment => "Second")
+      # logger.debug "Third Place: #{ordered_losers[1].name}"
+      # logger.debug "Second Place: #{ordered_losers[0].name}"
     end
     
-    logger.debug "First Place: #{first_place.name}"
+    # logger.debug "First Place: #{first_place.name}"
     
   end
   

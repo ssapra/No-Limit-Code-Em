@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   include RubyPoker
-  include TableManager
+  # include TableManager
   # require 'table_manager.rb'
   helper_method :respond_to_request,
                 :verify_player_turn?,

@@ -1,6 +1,6 @@
 require 'spec_helper'
-require_relative '../lib/table_manager/table_manager.rb'
-include TableManager
+# require_relative '../lib/table_manager/table_manager.rb'
+# include TableManager
 
 describe TableManager do
   
