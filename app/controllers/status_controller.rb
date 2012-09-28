@@ -43,36 +43,36 @@ class StatusController < ApplicationController
       end
     end
     
-    if params[:type] == "tournament"
-      status = Status.first
-      if status.tournament
-         status.tournament = false
-         status.play = false
-         status.save!
-      else 
-         status.tournament = true
-         status.play = true
-         status.save!
-         table = Table.first
-         table.begin_play
-      end
-      respond_to do |format|
-         format.html { redirect_to display_path }
-       end
-    end
-    
-    if params[:type] == "play"
-      status = Status.first
-      if status.play
-         status.play = false
-         status.save!
-      else 
-         status.play = true
-         status.save!
-      end
-      respond_to do |format|
-         format.html { redirect_to display_path }
-       end
-    end
+    # if params[:type] == "tournament"  NOT USED ANYMORE
+    #       status = Status.first
+    #       if status.tournament
+    #          status.tournament = false
+    #          status.play = false
+    #          status.save!
+    #       else 
+    #          status.tournament = true
+    #          status.play = true
+    #          status.save!
+    #          table = Table.first
+    #          table.begin_play
+    #       end
+    #       respond_to do |format|
+    #          format.html { redirect_to display_path }
+    #        end
+    #     end
+    #     
+    #     if params[:type] == "play"
+    #       status = Status.first
+    #       if status.play
+    #          status.play = false
+    #          status.save!
+    #       else 
+    #          status.play = true
+    #          status.save!
+    #       end
+    #       respond_to do |format|
+    #          format.html { redirect_to display_path }
+    #        end
+    #     end
   end
 end

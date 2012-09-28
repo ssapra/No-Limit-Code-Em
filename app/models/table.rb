@@ -92,7 +92,7 @@ class Table < ActiveRecord::Base
               self.begin_play
             end
         end
-      elsif (count_of_players == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1)
+      elsif (count_of_players == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1) || standard_shuffle?
       logger.debug "setup tables"
       status = Status.first
       status.update_attributes(:waiting => true)
@@ -173,6 +173,21 @@ class Table < ActiveRecord::Base
   
   def multiple_tables?
     return Table.all.count > 1
+  end
+  
+  def standard_shuffle?
+    if Table.all.count == 1
+      return false
+    else
+      Table.all.each do |table|
+        if table.rounds.count < ServerApp::Application.config.ROUND_LIMIT
+          return false
+        end
+      end
+      ServerApp::Application.config.ROUND_LIMIT += 5
+      logger.debug "#{ServerApp::Application.config.ROUND_LIMIT}"
+      return true
+    end
   end
   
   private
