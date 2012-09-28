@@ -92,6 +92,7 @@ class Round < ActiveRecord::Base
   
   def minimum_bet
     min_bet = 0
+    self.pot.reload
     self.pot.players.each do |player|
       if player.bet > min_bet # Checks the bets of players who have bet
           min_bet = player.bet
@@ -202,6 +203,7 @@ class Round < ActiveRecord::Base
     self.save
     
     self.pots.reverse.each do |pot|
+      pot.reload
       winners = find_winners(pot.player_ids)
       
       if winners.count == 1
@@ -250,7 +252,7 @@ class Round < ActiveRecord::Base
   
   def players_ready?
     min_bet = self.minimum_bet                  # Minimum bet re-checked
-
+    self.pot.reload
     self.pot.players.each do |player|
       if (player.action.nil? || player.bet != min_bet)    # Checks if player has done something and match the minimum 
         return false                          # NEED TO CONSIDER IF THEY ARE ALL IN
