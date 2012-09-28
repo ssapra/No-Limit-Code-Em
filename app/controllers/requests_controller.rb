@@ -47,7 +47,9 @@ class RequestsController < ApplicationController
           
           body.merge!({:hand => player.hand, 
                      :bet => player.bet, 
-                     :min_bet => round.minimum_bet, 
+                     :min_bet => round.minimum_bet,
+                     :max_bet => player.smallest_stack,
+                     :max_raise => [player.smallest_stack, player.smallest_stack - (round.minimum_bet - player.bet)].max, 
                      :stack => player.stack, 
                      :pot => round.total_pot, 
                      :table_id => table.id})
@@ -110,6 +112,26 @@ class RequestsController < ApplicationController
       format.html {render :json => body, :status => 200}
       format.xml  {render :xml => body, :status => 200}
       format.js
+    end
+  end
+  
+  def player_turn
+    player = Player.find_by_name(params[:name])
+
+    if player && verify_player_turn?(player) 
+      if player.replacement == false
+        logger.debug "RECEIVED PLAYER ACTION"
+        player.resolve_action(params[:player_action], params[:parameters])
+        player.round.next_action
+      elsif player.replacement && params[:player_action] == "replacement" 
+        logger.debug "REPLACEMENT RECEIVED"
+        player.replace_cards(params[:parameters]) 
+        player.round.next_replacement
+      end
+    end
+      
+    respond_to do |format|
+      format.html {redirect_to display_path}
     end
   end
   
