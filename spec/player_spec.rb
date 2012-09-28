@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe Player do
-  it "should return true" do 
-    true.should == true
-  end
   
   describe "#save_player_action" do
     it "should deduct the correct amount from their stack" do

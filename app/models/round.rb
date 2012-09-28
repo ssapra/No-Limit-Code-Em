@@ -34,15 +34,15 @@ class Round < ActiveRecord::Base
   end
   
   def start_betting
-    ids = []
-    self.players_in.each do |player| 
-      if player.stack > 0
-        ids << player.id
-      end
-    end
-    if ids.count == 1
+    # ids = []
+    #     self.players_in.each do |player| 
+    #       if player.stack > 0
+    #         ids << player.id
+    #       end
+    #     end
+    if self.all_but_one_in?
       self.determine_winner
-      self.reset_players
+      self.table.reset_players
     elsif self.anyone_is_all_in?
       Pot.create(:total => 0, :round_id => self.id, :player_ids => ids)
       self.next_action
@@ -54,7 +54,7 @@ class Round < ActiveRecord::Base
   def set_dealer
     if self.table.dealer_id
       seat = Player.find_by_id(self.table.dealer_id).seat
-      next_seat = seat.next_seat
+      next_seat = seat.next_seat("replace")  #Just to let it pass
       self.table.update_attributes(:dealer_id => next_seat.player.id )        # Next dealer set up
       return next_seat.id
     else
@@ -92,7 +92,8 @@ class Round < ActiveRecord::Base
   
   def minimum_bet
     min_bet = 0
-    self.players_in.each do |player|
+    self.pot.reload
+    self.pot.players.each do |player|
       if player.bet > min_bet # Checks the bets of players who have bet
           min_bet = player.bet
       end 
@@ -102,17 +103,18 @@ class Round < ActiveRecord::Base
     return min_bet
   end
   
-  def next_seat                                   # Moves dealer or finds next active player for betting/replacement
+  def next_seat(action)                                   # Moves dealer or finds next active player for betting/replacement
     if self.table.turn_id
       seat = Player.find_by_id(self.table.turn_id).seat
-      return seat.next_seat                       # If turn_id exists, next active player's seat is sent back
+      return seat.next_seat(action)                       # If turn_id exists, next active player's seat is sent back
     else                                          # If there's already a dealer, the person left of the dealer starts betting
       seat = Player.find_by_id(self.table.dealer_id).seat
-      return seat.next_seat
+      return seat.next_seat(action)
     end
   end
   
   def next_action
+    self.reload
     if self.players_in.count == 1                             
       logger.debug "ONLY 1 PLAYER LEFT"
       self.determine_winner
@@ -132,13 +134,13 @@ class Round < ActiveRecord::Base
       end
     else 
       logger.debug "BETTING CONTINUES"
-      player = self.next_seat.player        # Finds next player who is in the game
-      
+      player = self.next_seat("bet").player        # Finds next player who is in the game
+      player.reload
       if (player.action.nil? || player.bet != self.minimum_bet) && player.stack != 0
         self.table.turn_id = player.id
         self.table.save
         logger.debug "Player Turn: #{player.name}"
-      else                                 # If player is all good, move on to next player.
+      else                                 # If player is all good or all in, move on to next player.
         self.next_action
       end
     end  
@@ -162,7 +164,7 @@ class Round < ActiveRecord::Base
         self.next_action
       end
     else    
-      player = self.next_seat.player
+      player = self.next_seat("replace").player
       self.table.turn_id = player.id
       self.table.save
       player.replacement = true
@@ -202,6 +204,7 @@ class Round < ActiveRecord::Base
     self.save
     
     self.pots.reverse.each do |pot|
+      pot.reload
       winners = find_winners(pot.player_ids)
       
       if winners.count == 1
@@ -250,8 +253,8 @@ class Round < ActiveRecord::Base
   
   def players_ready?
     min_bet = self.minimum_bet                  # Minimum bet re-checked
-
-    self.players_in.each do |player|
+    self.pot.reload
+    self.pot.players.each do |player|
       if (player.action.nil? || player.bet != min_bet)    # Checks if player has done something and match the minimum 
         return false                          # NEED TO CONSIDER IF THEY ARE ALL IN
       end

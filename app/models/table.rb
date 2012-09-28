@@ -1,5 +1,6 @@
 class Table < ActiveRecord::Base
   include RubyPoker
+  include TableManager
   attr_accessible :deck, 
                   :pot, # Not being used anymore
                   :turn_id, 
@@ -48,14 +49,11 @@ class Table < ActiveRecord::Base
   end
   
   def reset_players                   # Called after a winner has been declared
-    @players = self.players.select {|player| player.in_game}
-    logger.debug "players: #{players.inspect}"
-    @players.each do |player|
+    players = self.players.select {|player| player.in_game}
+    players.each do |player|
       player.reload
       player.bet = 0
       player.action = nil
-      player.hand = []
-      logger.debug "Player: #{player.inspect}"
       if player.stack == 0          # If player loses everything, in_game set to false, seat won't be called upon
         PlayerActionLog.create(:hand_id => self.round.id,
                                :player_id => player.id,
@@ -67,6 +65,7 @@ class Table < ActiveRecord::Base
         player.save
         # player.destroy
       else
+        player.hand = []
         player.in_round = true        # Otherwise, back in the game baby...
         player.replacement = false
         player.save
@@ -74,40 +73,136 @@ class Table < ActiveRecord::Base
     end
     self.update_attributes(:deck => Deck.new)
     
-    players_in_game = self.players.select {|player| player.in_game}
-    if players_in_game.count == 1
-      PlayerActionLog.create(:hand_id => self.round.id,
-                             :player_id => players_in_game[0].id,
-                             :action => "won",
-                             :comment => ". Table #{self.id} is closing now.")
-      self.update_attributes(:game_over => true)
-    else
-      # if players_in_game.count <= empty_seats || players_in_game.count == 1
-      #        logger.debug "We have a winner: #{players_in_game[0].name}"
-      #        if Status.first.waiting == false
-      #          # Status.first.waiting = true
-      #          # Reassign players now
-      #        else
-      #          while Status.first.waiting == true
-      #            if Status.first.waiting == false && players_in_game.count <= empty_seats
-      #               # Status.first.waiting = true
-      #               # Reassign more players
-      #            end
-      #          end
-      #        end
-      #     end
-         
-      if Status.first.waiting                   # Checks if tables are being reassigned
-        while(Status.first.waiting == true)     # Waits to start next hand
-          if Status.first.waiting == false
-            logger.debug "DEALING CARDS FOR NEXT ROUND"
-            self.begin_play
-          end
-        end
-      else
-        logger.debug "DEALING CARDS FOR NEXT ROUND"
-        self.begin_play
+    logger.debug "CHECKPOINT"
+    count_of_players = 0
+    self.players.each do |player|
+      player.reload
+      if player.in_game
+        count_of_players+=1
       end
+    end
+    logger.debug "Players in game: #{count_of_players}"
+    status = Status.first
+    status.reload
+      if Status.first.waiting == true
+        while(Status.first.waiting)
+          Status.first.reload
+            if Status.first.waiting == false 
+              logger.debug "DEALING CARDS FOR NEXT ROUND"
+              self.begin_play
+            end
+        end
+      elsif (count_of_players == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1) || standard_shuffle?
+      logger.debug "setup tables"
+      status = Status.first
+      status.update_attributes(:waiting => true)
+      while(!all_tables_ready?)
+        if (all_tables_ready?)
+          setup_tables
+          Status.first.update_attributes(:waiting => false)
+        end
+      end
+    elsif count_of_players == 1 && Table.all.count == 1
+      logger.debug ("GAME OVER")
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => Player.find_by_in_game(true).id,
+                             :action => "won",
+                             :comment => "First")
+      self.find_winners
+      Status.first.update_attributes(:game => false)
+    else
+      logger.debug "DEALING CARDS FOR NEXT ROUND"
+      self.begin_play
+    end
+  end
+  
+  def shuffle_to_one_table?
+    Player.all.select {|player| player if player.in_game}.count <= 6
+  end
+  
+  def all_tables_ready?
+    Table.all.each do |table|
+      if table.turn_id != nil
+        return false
+      end
+    end
+    true
+  end
+      
+  
+  def find_winners
+    first_place = Player.find_by_in_game(true)
+    third_place_log = find_last_hand(3)
+    second_place_log = find_last_hand(2)
+    if third_place_log != second_place_log # true if (X - 3 - 2 - 1) or (X - 2 - 1) or (2 - 1)
+      # if second_place_log != nil # (X - )
+      if third_place_log
+        loser_logs = PlayerActionLog.find_all_by_action_and_hand_id("lost", third_place_log.hand_id)
+        loser_ids = loser_logs.map{|log| log.player_id}
+        players = loser_ids.map {|id| Player.find_by_id(id)}
+        winner = players.max {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand of the losers
+        PlayerActionLog.create(:hand_id => self.round.id,
+                               :player_id => winner.id,
+                               :action => "won",
+                               :comment => "Third")
+        # logger.debug "Third Place: #{winner.name}"
+      end
+      log = second_place_log.players_ids.split(" ")
+      log.delete(first_place.id.to_s)
+      second_place = Player.find_by_id(log[0])
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => second_place.id,
+                             :action => "won",
+                             :comment => "Second")
+      # logger.debug "Second Place: #{second_place.name}"
+    else
+      loser_logs = PlayerActionLog.find_all_by_action_and_hand_id("lost", third_place_log.hand_id)
+      loser_ids = loser_logs.map{|log| log.player_id}
+      players = loser_ids.map {|id| Player.find_by_id(id)}
+      ordered_losers = players.sort {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand of the losers
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => order_losers[1].id,
+                             :action => "won",
+                             :comment => "Third")
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => order_losers[0].id,
+                             :action => "won",
+                             :comment => "Second")
+      # logger.debug "Third Place: #{ordered_losers[1].name}"
+      # logger.debug "Second Place: #{ordered_losers[0].name}"
+    end
+    
+    # logger.debug "First Place: #{first_place.name}"
+    
+  end
+  
+  def find_last_hand(number_of_players)
+    round_ids = self.rounds.pluck(:id)
+    for round_id in round_ids.reverse
+      log = HandLog.find_by_hand_id(round_id)
+      if log.players_ids.split(" ").count >= number_of_players
+        return log
+      end
+    end
+    return nil
+  end
+  
+  def multiple_tables?
+    return Table.all.count > 1
+  end
+  
+  def standard_shuffle?
+    if Table.all.count == 1
+      return false
+    else
+      Table.all.each do |table|
+        if table.rounds.count < ServerApp::Application.config.ROUND_LIMIT
+          return false
+        end
+      end
+      ServerApp::Application.config.ROUND_LIMIT += 5
+      logger.debug "#{ServerApp::Application.config.ROUND_LIMIT}"
+      return true
     end
   end
   

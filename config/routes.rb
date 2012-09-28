@@ -9,6 +9,6 @@ ServerApp::Application.routes.draw do
   get "/game_state" => 'requests#state', :as => :states #player asks for state
   
   post "/status" => 'status#status', :as => :status #used to toggle game states
-  post "/player" => 'games#player_turn' #player sends action here
+  post "/player" => 'requests#player_turn' #player sends action here
   
 end

@@ -1,0 +1,1 @@
+require 'table_manager/table_manager'
