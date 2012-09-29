@@ -2,7 +2,25 @@ require 'net/http'
 require 'json'
 
 namespace :bot do
+  task :run_many do
+    num = ENV['num'].to_i
+
+    threads = num.times.collect do |i| 
+      Thread.new do 
+        puts "\nThread #{i} lives!"
+        run_bot!
+        puts "\nThread #{i} dies!"
+      end
+    end
+
+    threads.map(&:join)
+  end
+
   task :run do
+    run_bot!
+  end
+
+  def run_bot!
     name = ENV['name'] || SecureRandom.uuid.first(6)
     
     puts "Bot spinning up, attempting to register with name #{name}..."
@@ -18,7 +36,7 @@ namespace :bot do
       key = player_json["player_key"]
     
       while true 
-        sleep ENV['delay'].to_f || 1
+        sleep (ENV['delay'] && ENV['delay'].to_f) || 1
         request = Net::HTTP::Get.new("/game_state?name=#{name}&player_key=#{key}")
         response = http.request request
 
