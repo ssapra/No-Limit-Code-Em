@@ -52,29 +52,41 @@ class Table < ActiveRecord::Base
     self.deck.deal.to_s.gsub(/-/,"") .gsub(/'/," ")
   end
   
+  def save_losers
+    players = self.players.select do |player| 
+      player.reload
+      player if player.in_game && player.stack == 0
+    end
+    
+    players.sort! {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}
+    
+    players.each do |player|
+      player.losing_time = Time.now
+      PlayerActionLog.create(:hand_id => self.round.id,
+                             :player_id => player.id,
+                             :action => "lost")
+      player.in_game = false
+      player.seat.player_id = nil
+      player.in_round = false
+      player.seat.save
+      player.save
+    end
+    
+  end
+  
   def reset_players                   # Called after a winner has been declared
+    save_losers
     players = self.players.select {|player| player.in_game}
     players.each do |player|
       player.reload
       player.bet = 0
       player.action = nil
-      if player.stack == 0          # If player loses everything, in_game set to false, seat won't be called upon
-        PlayerActionLog.create(:hand_id => self.round.id,
-                               :player_id => player.id,
-                               :action => "lost")
-        player.in_game = false
-        player.seat.player_id = nil
-        player.in_round = false
-        player.seat.save
-        player.save
-        # player.destroy
-      else
-        player.hand = []
-        player.in_round = true        # Otherwise, back in the game baby...
-        player.replacement = false
-        player.save
-      end
+      player.hand = []
+      player.in_round = true        # Otherwise, back in the game baby...
+      player.replacement = false
+      player.save
     end
+  
     self.update_attributes(:deck => Deck.new)
     
     logger.debug "CHECKPOINT"
@@ -112,6 +124,7 @@ class Table < ActiveRecord::Base
                              :player_id => Player.find_by_in_game(true).id,
                              :action => "won",
                              :comment => "First")
+      Player.find_by_in_game(true).update_attributes(:losing_time => Time.now)
       self.find_winners
       Table.destroy_all
       # Status.first.update_attributes(:game => false)
@@ -166,11 +179,11 @@ class Table < ActiveRecord::Base
       players = loser_ids.map {|id| Player.find_by_id(id)}
       ordered_losers = players.sort {|a,b| PokerHand.new(a.hand) <=> PokerHand.new(b.hand)}      # Find best hand of the losers
       PlayerActionLog.create(:hand_id => self.round.id,
-                             :player_id => order_losers[1].id,
+                             :player_id => ordered_losers[1].id,
                              :action => "won",
                              :comment => "Third")
       PlayerActionLog.create(:hand_id => self.round.id,
-                             :player_id => order_losers[0].id,
+                             :player_id => ordered_losers[0].id,
                              :action => "won",
                              :comment => "Second")
       # logger.debug "Third Place: #{ordered_losers[1].name}"

@@ -10,7 +10,8 @@ class Player < ActiveRecord::Base
                   :in_game,
                   :in_round,
                   :replacement,
-                  :seat_id
+                  :seat_id,
+                  :losing_time
                   
   serialize :hand
   validates :name, :uniqueness => true 
