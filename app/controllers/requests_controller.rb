@@ -89,15 +89,18 @@ class RequestsController < ApplicationController
           logger.debug "Body : #{body.inspect}"
         else
            first = PlayerActionLog.find_by_comment("First")
-           # logger.debug "First exists: #{first}"
-           Player.all.sort!{|a,b| a.losing_time <=> b.losing_time}
-           index = 0
-           summary = Player.all.map do |player|
-             index+=1
-             "#{index}: #{player.name}"
+           if first
+             players = Player.all.sort!{|a,b| b.losing_time <=> a.losing_time}
+             index = 0
+             summary = players.map do |player|
+               index+=1
+               "#{index}: #{player.name}"
+             end
+             summary.unshift("Tournament is Over.", " ", "Player Standings", "----------------") 
+             body = {:message => "Tournament is Over", :winning_summary => summary, :game_over => true}
+           else
+             body = {:message => "You're out"}
            end
-           summary.unshift("Tournament is Over.", " ", "Player Standings", "----------------") 
-           body = {:message => "You're out", :winning_summary => summary, :game_over => true}
         end
       end
     else 
