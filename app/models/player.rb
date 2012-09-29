@@ -18,7 +18,11 @@ class Player < ActiveRecord::Base
   
   def table
     seat = Seat.find_by_id(self.seat_id)
-    return Table.find_by_id(seat.table_id)
+    if seat
+      Table.find_by_id(seat.table_id)
+    else
+      nil
+    end
   end
   
   def round

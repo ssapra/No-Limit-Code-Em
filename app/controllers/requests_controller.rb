@@ -22,23 +22,11 @@ class RequestsController < ApplicationController
       player = Player.find_by_name(params[:name]) 
       if player                                     # Added security for this part
         table = player.table
-        round ||= table.round
         body = {}
         if table != nil
           
-           
-          # 
-          # logs = HandLog.find_all_by_table_id(table.id)
-          # # round_id = logs[logs.length - 2].hand_id
-          # previous_round = logs[logs.length - 1].hand_id
-          # winning_action = PlayerActionLog.find_all_by_hand_id_and_action(previous_round, "win")
-          # body[:table_winner] = winning_action.map do |action|
-          #   player_name = Player.find_by_id(action.player_id).name
-          #   "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
-          # end
-          # body[:table_winner] << "#{Player.find_by_id(winning_action[0].player_id).name} won. Game is over."
-          # 
-
+          round = table.round
+          
           if table.turn_id 
             current_player = Player.find_by_id(table.turn_id)
             body.merge!({:current_player => current_player.name, :replacement => current_player.replacement})

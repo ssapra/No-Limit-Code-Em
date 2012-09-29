@@ -17,7 +17,11 @@ class Table < ActiveRecord::Base
   has_many :rounds, :dependent => :destroy
   
   def round
-    self.rounds.last
+    if self.rounds
+      self.rounds.last
+    else 
+      nil
+    end
   end
   
   def begin_play
@@ -109,7 +113,8 @@ class Table < ActiveRecord::Base
                              :action => "won",
                              :comment => "First")
       self.find_winners
-      Status.first.update_attributes(:game => false)
+      Table.destroy_all
+      # Status.first.update_attributes(:game => false)
     else
       logger.debug "DEALING CARDS FOR NEXT ROUND"
       self.begin_play
