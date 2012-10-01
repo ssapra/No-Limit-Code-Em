@@ -55,8 +55,10 @@ class Player < ActiveRecord::Base
     else
       if acceptable_replacement?(replace)
         discarded_cards = remove_cards(replace)
+        logger.debug "discarded: #{discarded_cards}"
         num_of_replacements = discarded_cards.length
         replacement_cards = new_cards(num_of_replacements)
+        logger.debug "replacements: #{replacement_cards}"
         self.hand += replacement_cards
         self.save
         PlayerActionLog.create(:hand_id => round.id,
@@ -65,7 +67,7 @@ class Player < ActiveRecord::Base
                                :cards => replacement_cards.join(",").gsub(","," "))
         reset_after_replacement                              # Sets action to nil, bet to 0, replacement to true
       else
-        PlayerActionLog.create(:hand_id => round.id, :parameter => replace, :action => "fold", :player_id => self.id, :comment => "Invalid Replacement")
+        PlayerActionLog.create(:hand_id => round.id, :cards => replace, :action => "fold", :player_id => self.id, :comment => "Invalid Replacement")
         self.reload
         self.in_round = false
         self.save
@@ -76,12 +78,13 @@ class Player < ActiveRecord::Base
   
   def remove_cards(replace)
     array_of_discards = []
-    replace.split(" ").each do |index|
+    replace.split("").each do |index|
       array_of_discards << self.hand[index.to_i-1]
     end
     PlayerActionLog.create(:hand_id => self.round.id, :player_id => self.id, :action => "replace", :cards => array_of_discards.join(",").gsub(","," "))
     self.hand-=array_of_discards
     self.save
+    logger.debug "array of discards: #{array_of_discards}"
     return array_of_discards
   end
   
@@ -96,7 +99,7 @@ class Player < ActiveRecord::Base
   end
   
   def acceptable_replacement?(replace)      # REPLACEMENT VALIDATION HAPPENS HERE
-    replace = replace.split(" ")
+    replace = replace.split("")
     logger.debug "replace: #{replace}"
     if replace.length == replace.uniq.length && replace.length <= 3
       replace.each do |number|
