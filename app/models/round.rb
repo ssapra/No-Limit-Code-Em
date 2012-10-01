@@ -208,11 +208,8 @@ class Round < ActiveRecord::Base
       winners = find_winners(pot.player_ids)
       
       if winners.count == 1
-        logger.debug "#{winners[0].name} has won this round with #{winners[0].hand}."
-        logger.debug "#{winners[0].name} wins #{pot.total} chips"
         winners[0].stack += pot.total
         winners[0].save
-          
         PlayerActionLog.create(:hand_id => self.id,
                                :player_id => winners[0].id,
                                :action => "win",                                 
@@ -224,7 +221,6 @@ class Round < ActiveRecord::Base
         winners.each do |winner|  # NEED TO REMEMBER TO KEEP EXTRA CHIPS IN POT FOR NEXT ROUND
           winner.stack += self.pot/division 
           winner.save
-          
           PlayerActionLog.create(:hand_id => self.id,
                                :player_id => winner.id,
                                :action => "win",
@@ -234,7 +230,6 @@ class Round < ActiveRecord::Base
       end
       
     end
-    logger.debug "players: #{self.players_in.inspect}"
   end
   
   def find_winners(player_ids)
