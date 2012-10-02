@@ -2,11 +2,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   include RubyPoker
   include ApplicationHelper
-  # include TableManager
-  # require 'table_manager.rb'
+  include PlayersHelper
   helper_method :respond_to_request,
-                :verify_player_turn?,
-                :setup_tables,
                 :empty_seats
   protected
   
@@ -20,19 +17,6 @@ class ApplicationController < ActionController::Base
       end
     end
     return count
-  end
-  
-  def verify_player_turn?(player)
-     #if Digest::MD5.hexdigest("#{temp_player.name} #{temp_player.game_id} TREY") == player.player_key
-      begin 
-         table = player.table
-         if table.turn_id == player.id
-           return true
-         end
-         return false
-      rescue
-         return false
-      end
   end
       
   
@@ -66,21 +50,5 @@ class ApplicationController < ActionController::Base
     end
     return body
   end
-  
-  # def setup_tables
-  #     logger.debug "REACHED TABLES"
-  #     Table.destroy_all
-  #     player_ids = Player.all.map {|player| player.id if player.in_game}
-  #     logger.debug "ids: #{player_ids}"
-  #     table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE)
-  #     logger.debug "#{table_list}"
-  #     table_list.each do |players|
-  #       table = Table.create(:deck => Deck.new)
-  #       players.each do |id|
-  #         seat = Seat.create(:table_id => table.id, :player_id => id)
-  #         Player.find_by_id(id).update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
-  #       end
-  #     end
-  #   end
   
 end

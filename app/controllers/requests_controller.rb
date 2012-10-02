@@ -1,6 +1,7 @@
 class RequestsController < ApplicationController
   require 'digest/md5'
   require 'net/http'
+  include RequestsHelper
   
   def display
     @players = Player.all
@@ -20,10 +21,10 @@ class RequestsController < ApplicationController
   def state
     if Status.first.game
       player = Player.find_by_name(params[:name]) 
-      if player                                     # Added security for this part
+      if player && verify_player?(player, params[:player_key])                               
         table = player.table
         body = {}
-        if table != nil
+        if table != nil # TABLE IS STILL ALIVE OR TABLE IS WAIITNG TO RESHUFFLE
           
           round = table.round
           
@@ -43,97 +44,20 @@ class RequestsController < ApplicationController
                      :pot => round.total_pot, 
                      :table_id => table.id})
                      
-                     
-       
-          if round.second_bet then br_id = 2 else br_id = 1 end
-          # actions = PlayerActionLog.find_all_by_betting_round_id_and_hand_id_and_action(br_id, round.id, ["check","bet","fold"])
-          actions = PlayerActionLog.find_all_by_betting_round_id_and_hand_id(br_id, round.id)
-        
-          body[:betting_summary] = actions.map do |action|
-            player_name = Player.find_by_id(action.player_id).name 
-            if action.comment
-              "#{player_name} #{action.action.pluralize} #{action.amount} -- #{action.comment}"
-            else
-              "#{player_name} #{action.action.pluralize} #{action.amount}"
-            end
-          end
-        
-        
-        
-          replacements = PlayerActionLog.find_all_by_hand_id_and_action(round.id, "replace")
-          body[:replacement_summary] = replacements.map do |action| 
-            player_name = Player.find_by_id(action.player_id).name
-            if action.cards then num_replaced = action.cards.split(" ").length else num_replaced = 0 end
-            "#{player_name} replaced #{num_replaced} cards"
-          end
-        
-        
-        
-          logs = HandLog.find_all_by_table_id(table.id)
-          if logs.length > 1 && round.second_bet == false || table.waiting
-            if table.waiting
-              round_id = logs.last.hand_id
-            else
-              round_id = logs[logs.length - 2].hand_id
-            end
-            winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, ["win","lost"])
-            body[:round_summary] = winning_action.map do |action|
-              player_name = Player.find_by_id(action.player_id).name
-              if action.action == "win"
-                "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
-              else
-                "#{player_name} lost"
-              end
-            end
-          end
-          
-        
-          if verify_player_turn?(player)
-            body[:play] = true
-          else 
-            body[:play] = false
-          end
-          
-          if table.waiting
-            body[:waiting => true]
-            body[:message => "Tables are about to reshuffle..."]
-          end
-          
+          body[:betting_summary] = betting_summary(round)
+          body[:replacement_summary] = replacement_summary(round)        
+          body[:round_summary] = round_summary(table, round)
+          body[:play] = verify_player_turn?(player)
+          body.merge!({:waiting => true, :message => "Tables are about to reshuffle..."}) if table.waiting
           logger.debug "Body : #{body.inspect}"  
-        else
+        else # TABLE DOESN'T EXIST MEANS 1. YOUR OUT, BUT TOURNAMENT IS STILL GOING OR 2. TOURNAMENT IS OVER
            first = PlayerActionLog.find_by_comment("First")
-           if first
-             players = Player.all.sort!{|a,b| b.losing_time <=> a.losing_time}
-             index = 0
-             summary = players.map do |player|
-               index+=1
-               "#{index}: #{player.name}"
-             end
-             summary.unshift("Tournament is Over.", " ", "Player Standings", "----------------") 
-        
-             round_id = HandLog.last.hand_id
-             winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, ["win","lost"])
-             previous_winner = winning_action.map do |action|
-               player_name = Player.find_by_id(action.player_id).name
-               if action.action == "win"
-                 "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
-               else
-                 "#{player_name} lost"
-               end
-             end
-          
-             
+           if first # TOURNAMENT IS OVER
+             summary = player_standings
+             previous_winner = capture_round_summary_data(HandLog.last.hand_id)
              body = {:message => "Tournament is Over", :winning_summary => summary, :round_summary => previous_winner, :game_over => true}
-           else
-             winning_action = PlayerActionLog.find_all_by_player_id_and_action(player.id, ["win","lost"]) # How to stop this from happening each time they ping me?
-             previous_winner = winning_action.map do |action|
-               player_name = Player.find_by_id(action.player_id).name
-               if action.action == "win"
-                 "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
-               else
-                 "#{player_name} lost"
-               end
-             end
+           else # TOURNAMENT IS STILL GOING
+             previous_winner = players_last_summary(player.id)
              body = {:message => "You're out", :round_summary => previous_winner}
            end
         end
@@ -152,7 +76,7 @@ class RequestsController < ApplicationController
   def player_turn
     player = Player.find_by_name(params[:name])
 
-    if player && verify_player_turn?(player) 
+    if player && verify_player?(player, params[:player_key]) && verify_player_turn?(player) 
       if player.replacement == false
         logger.debug "RECEIVED PLAYER ACTION"
         player.resolve_action(params[:player_action], params[:parameters])
