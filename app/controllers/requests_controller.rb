@@ -70,8 +70,12 @@ class RequestsController < ApplicationController
         
         
           logs = HandLog.find_all_by_table_id(table.id)
-          if logs.length > 1 && round.second_bet == false
-            round_id = logs[logs.length - 2].hand_id
+          if logs.length > 1 && round.second_bet == false || table.waiting
+            if table.waiting
+              round_id = logs.last.hand_id
+            else
+              round_id = logs[logs.length - 2].hand_id
+            end
             winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, ["win","lost"])
             body[:round_summary] = winning_action.map do |action|
               player_name = Player.find_by_id(action.player_id).name
@@ -90,7 +94,12 @@ class RequestsController < ApplicationController
             body[:play] = false
           end
           
-          logger.debug "Body : #{body.inspect}"
+          if table.waiting
+            body[:waiting => true]
+            body[:message => "Tables are about to reshuffle..."]
+          end
+          
+          logger.debug "Body : #{body.inspect}"  
         else
            first = PlayerActionLog.find_by_comment("First")
            if first
@@ -101,7 +110,7 @@ class RequestsController < ApplicationController
                "#{index}: #{player.name}"
              end
              summary.unshift("Tournament is Over.", " ", "Player Standings", "----------------") 
-             
+        
              round_id = HandLog.last.hand_id
              winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, ["win","lost"])
              previous_winner = winning_action.map do |action|
@@ -112,15 +121,25 @@ class RequestsController < ApplicationController
                  "#{player_name} lost"
                end
              end
+          
              
              body = {:message => "Tournament is Over", :winning_summary => summary, :round_summary => previous_winner, :game_over => true}
            else
-             body = {:message => "You're out"}
+             winning_action = PlayerActionLog.find_all_by_player_id_and_action(player.id, ["win","lost"]) # How to stop this from happening each time they ping me?
+             previous_winner = winning_action.map do |action|
+               player_name = Player.find_by_id(action.player_id).name
+               if action.action == "win"
+                 "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
+               else
+                 "#{player_name} lost"
+               end
+             end
+             body = {:message => "You're out", :round_summary => previous_winner}
            end
         end
       end
-    else 
-       body = {:message => "Game hasn't started yet"}
+    else
+      body = {:message => "Game hasn't started yet"}
     end
   
     respond_to do |format|
