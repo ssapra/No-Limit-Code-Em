@@ -11,13 +11,14 @@ class Action < ActiveRecord::Base
   
   def self.bet(player, action, parameter)
     bet = parameter.to_i
-    min_bet = player.round.minimum_bet
-    minimum_stack = player.smallest_stack
+    round = player.round
+    min_bet = round.minimum_bet
+    minimum_stack = round.smallest_stack
     if min_bet == player.bet && bet <= player.stack && bet <= minimum_stack
       Action.save_player_action(player, "bet", bet)
     elsif min_bet == player.bet && bet <= player.stack && bet > minimum_stack
       Action.record_raw_action(player, action, parameter)
-      bet = player.smallest_stack
+      bet = minimum_stack
       Action.save_player_action(player, "bet", bet)
     else          
       Action.record_raw_action(player, action, parameter)
@@ -38,9 +39,9 @@ class Action < ActiveRecord::Base
   
   def self.raising(player, action, parameter)
     raise_amount = parameter.to_i
-    min_bet = player.round.minimum_bet
-    minimum_stack = player.smallest_stack
-    # probably should have some validation that bet is not a string in the first place
+    round = player.round
+    min_bet = round.minimum_bet
+    minimum_stack = round.smallest_stack
     call_amount = min_bet - player.bet
     total_bet = raise_amount + call_amount
     if min_bet != player.bet && total_bet <= player.stack && raise_amount > 0 && raise_amount <= minimum_stack

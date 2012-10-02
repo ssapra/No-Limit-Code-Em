@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120929165942) do
+ActiveRecord::Schema.define(:version => 20121002040231) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(:version => 20120929165942) do
     t.integer  "placeholder_id"
     t.integer  "dealer_id"
     t.boolean  "game_over"
+    t.boolean  "waiting"
   end
 
 end

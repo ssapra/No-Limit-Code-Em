@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   include RubyPoker
+  include ApplicationHelper
   # include TableManager
   # require 'table_manager.rb'
   helper_method :respond_to_request,
@@ -66,20 +67,20 @@ class ApplicationController < ActionController::Base
     return body
   end
   
-  def setup_tables
-    logger.debug "REACHED TABLES"
-    Table.destroy_all
-    player_ids = Player.all.map {|player| player.id if player.in_game}
-    logger.debug "ids: #{player_ids}"
-    table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE)
-    logger.debug "#{table_list}"
-    table_list.each do |players|
-      table = Table.create(:deck => Deck.new)
-      players.each do |id|
-        seat = Seat.create(:table_id => table.id, :player_id => id)
-        Player.find_by_id(id).update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
-      end
-    end
-  end
+  # def setup_tables
+  #     logger.debug "REACHED TABLES"
+  #     Table.destroy_all
+  #     player_ids = Player.all.map {|player| player.id if player.in_game}
+  #     logger.debug "ids: #{player_ids}"
+  #     table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE)
+  #     logger.debug "#{table_list}"
+  #     table_list.each do |players|
+  #       table = Table.create(:deck => Deck.new)
+  #       players.each do |id|
+  #         seat = Seat.create(:table_id => table.id, :player_id => id)
+  #         Player.find_by_id(id).update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
+  #       end
+  #     end
+  #   end
   
 end

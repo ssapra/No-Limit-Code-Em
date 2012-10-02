@@ -32,7 +32,7 @@ class RequestsController < ApplicationController
             body.merge!({:current_player => current_player.name, :replacement => current_player.replacement})
           end
           
-          smallest_stack = player.smallest_stack
+          smallest_stack = round.smallest_stack
           
           body.merge!({:hand => player.hand, 
                      :bet => player.bet, 
@@ -72,10 +72,14 @@ class RequestsController < ApplicationController
           logs = HandLog.find_all_by_table_id(table.id)
           if logs.length > 1 && round.second_bet == false
             round_id = logs[logs.length - 2].hand_id
-            winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, "win")
-            body[:previous_winner] = winning_action.map do |action|
+            winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, ["win","lost"])
+            body[:round_summary] = winning_action.map do |action|
               player_name = Player.find_by_id(action.player_id).name
-              "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
+              if action.action == "win"
+                "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
+              else
+                "#{player_name} lost"
+              end
             end
           end
           
@@ -97,7 +101,19 @@ class RequestsController < ApplicationController
                "#{index}: #{player.name}"
              end
              summary.unshift("Tournament is Over.", " ", "Player Standings", "----------------") 
-             body = {:message => "Tournament is Over", :winning_summary => summary, :game_over => true}
+             
+             round_id = HandLog.last.hand_id
+             winning_action = PlayerActionLog.find_all_by_hand_id_and_action(round_id, ["win","lost"])
+             previous_winner = winning_action.map do |action|
+               player_name = Player.find_by_id(action.player_id).name
+               if action.action == "win"
+                 "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
+               else
+                 "#{player_name} lost"
+               end
+             end
+             
+             body = {:message => "Tournament is Over", :winning_summary => summary, :round_summary => previous_winner, :game_over => true}
            else
              body = {:message => "You're out"}
            end

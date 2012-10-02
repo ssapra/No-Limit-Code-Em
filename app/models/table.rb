@@ -1,6 +1,7 @@
 class Table < ActiveRecord::Base
   include RubyPoker
   include TableManager
+  include ApplicationHelper
   attr_accessible :deck, 
                   :pot, # Not being used anymore
                   :turn_id, 
@@ -8,6 +9,7 @@ class Table < ActiveRecord::Base
                   :betting_round, # Not being used anymore
                   :placeholder_id, # Not being used anymore, useless
                   :dealer_id,
+                  :waiting,
                   :game_over
                   
   serialize :deck
@@ -101,37 +103,31 @@ class Table < ActiveRecord::Base
     status = Status.first
     status.reload
       if Status.first.waiting == true
-        while(Status.first.waiting)
-          Status.first.reload
-            if Status.first.waiting == false 
-              logger.debug "DEALING CARDS FOR NEXT ROUND"
-              self.begin_play
-            end
-        end
-      elsif (count_of_players == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1) || standard_shuffle?
-      logger.debug "setup tables"
-      status = Status.first
-      status.update_attributes(:waiting => true)
-      while(!all_tables_ready?)
-        if (all_tables_ready?)
+        self.update_attributes(:waiting => true)
+        if all_tables_ready?
           setup_tables
           Status.first.update_attributes(:waiting => false)
+          Table.all.each do |table|
+            table.begin_play
+          end
         end
+      elsif (count_of_players == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1) || standard_shuffle?
+        Status.first.update_attributes(:waiting => true)
+        self.update_attributes(:waiting => true)
+      elsif count_of_players == 1 && Table.all.count == 1
+        logger.debug ("GAME OVER")
+        PlayerActionLog.create(:hand_id => self.round.id,
+                               :player_id => Player.find_by_in_game(true).id,
+                               :action => "won",
+                               :comment => "First")
+        Player.find_by_in_game(true).update_attributes(:losing_time => Time.now)
+        self.find_winners
+        Table.destroy_all
+        # Status.first.update_attributes(:game => false)
+      else
+        logger.debug "DEALING CARDS FOR NEXT ROUND"
+        self.begin_play
       end
-    elsif count_of_players == 1 && Table.all.count == 1
-      logger.debug ("GAME OVER")
-      PlayerActionLog.create(:hand_id => self.round.id,
-                             :player_id => Player.find_by_in_game(true).id,
-                             :action => "won",
-                             :comment => "First")
-      Player.find_by_in_game(true).update_attributes(:losing_time => Time.now)
-      self.find_winners
-      Table.destroy_all
-      # Status.first.update_attributes(:game => false)
-    else
-      logger.debug "DEALING CARDS FOR NEXT ROUND"
-      self.begin_play
-    end
   end
   
   def shuffle_to_one_table?
@@ -140,7 +136,8 @@ class Table < ActiveRecord::Base
   
   def all_tables_ready?
     Table.all.each do |table|
-      if table.turn_id != nil
+      table.reload
+      if table.waiting == false
         return false
       end
     end

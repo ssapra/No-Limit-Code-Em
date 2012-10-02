@@ -257,6 +257,16 @@ class Round < ActiveRecord::Base
     return true
   end
   
+  def smallest_stack
+    smallest_stack = 10000
+    self.pot.players.each do |player|
+      if player.stack <= smallest_stack
+        smallest_stack = player.stack
+      end
+    end
+    return smallest_stack
+  end
+  
   def anyone_is_all_in?
     self.players_in.each do |player|
       if player.stack == 0 

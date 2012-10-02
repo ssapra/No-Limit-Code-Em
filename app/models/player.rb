@@ -41,10 +41,10 @@ class Player < ActiveRecord::Base
       when "raise"
         Action.raising(self, action, parameter)
       when "fold"
-        fold_action_log
+        Action.record_fold(self)
       else
-        raw_action_log(action, parameter)
-        fold_action_log
+        Action.record_raw_action(self, action, parameter)
+        Action.record_fold(self)
     end
   end
   
@@ -55,23 +55,15 @@ class Player < ActiveRecord::Base
     else
       if acceptable_replacement?(replace)
         discarded_cards = remove_cards(replace)
-        logger.debug "discarded: #{discarded_cards}"
         num_of_replacements = discarded_cards.length
         replacement_cards = new_cards(num_of_replacements)
-        logger.debug "replacements: #{replacement_cards}"
         self.hand += replacement_cards
         self.save
-        PlayerActionLog.create(:hand_id => round.id,
-                               :player_id => self.id,
-                               :action => "receive",
-                               :cards => replacement_cards.join(",").gsub(","," "))
-        reset_after_replacement                              # Sets action to nil, bet to 0, replacement to true
+        PlayerActionLog.create(:hand_id => round.id, :player_id => self.id, :action => "receive", :cards => replacement_cards.join(",").gsub(","," "))
+        reset_after_replacement
       else
         PlayerActionLog.create(:hand_id => round.id, :cards => replace, :action => "fold", :player_id => self.id, :comment => "Invalid Replacement")
-        self.reload
-        self.in_round = false
-        self.save
-        self.remove_from_pot
+        Action.record_fold(self)
       end
     end
   end
@@ -90,11 +82,13 @@ class Player < ActiveRecord::Base
   
   def new_cards(amount_needed)
     temp_hand = []
+    table = self.table
     amount_needed.times do
-      self.table.reload
+      table.reload
       temp_hand << table.deal
+      table.save
     end
-    table.save
+    # table.save
     return temp_hand
   end
   
@@ -131,16 +125,6 @@ class Player < ActiveRecord::Base
     else
       return 1
     end
-  end
-  
-  def smallest_stack
-    smallest_stack = 10000
-    self.round.pot.players.each do |player|
-      if player.stack <= smallest_stack
-        smallest_stack = player.stack
-      end
-    end
-    return smallest_stack
   end
   
   def remove_from_pot
