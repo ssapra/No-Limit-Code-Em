@@ -33,6 +33,8 @@ class Round < ActiveRecord::Base
       self.table.deal_cards
       self.table.save
       self.start_betting
+    else 
+      self.determine_winner
     end
   end
   

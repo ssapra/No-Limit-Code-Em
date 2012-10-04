@@ -37,7 +37,9 @@ class Table < ActiveRecord::Base
   end
   
   def deal_cards 
+    round.pot.reload
     players = self.round.pot.players
+    logger.debug "players to be dealt: #{players}"
     player_ids = players.map {|player| player.id}
     dealer_position = player_ids.index(self.dealer_id)
     ordered_players = players.push(players.shift(dealer_position+1)).flatten   # Orders players based on dealer position
