@@ -28,9 +28,12 @@ class Round < ActiveRecord::Base
     HandLog.create(:hand_id => self.id, :table_id => table.id, :players_ids => player_ids.join(",").gsub(","," "), :dealer_seat_id => dealer_seat_id)
     Pot.create(:total => 0, :round_id => self.id, :player_ids => player_ids)
     self.ante_up
-    self.table.deal_cards
-    self.table.save
-    self.start_betting
+    logger.debug "players :#{pot.players.inspect}"
+    if pot.players.count > 1  
+      self.table.deal_cards
+      self.table.save
+      self.start_betting
+    end
   end
   
   def start_betting
