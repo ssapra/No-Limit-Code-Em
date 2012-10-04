@@ -18,10 +18,11 @@ class RequestsController < ApplicationController
     else
       body = respond_to_request(params[:name], params[:game_id])
     end
-    message = ["#{body[:message]}"]
-    if body[:player_key] then message << "Your player key is #{body[:player_key]}" end
+    message = "#{body[:message]}"
+    if body[:player_key] then message += " Your player key is #{body[:player_key]}" end
+    flash[:notice] = message
     respond_to do |format|
-      format.html {redirect_to root_path, flash.keep[:notice] => message}
+      format.html {redirect_to root_path}
       format.json {render :json => body, :status => 200}
       format.xml {render :xml => body, :status => 200}
     end

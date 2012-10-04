@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
       if player.valid?          # Checks if name and game_id are unique and valid
         player.player_key = Digest::MD5.hexdigest("#{player.name} #{player.game_id} TREY")  #player key assigned
         player.save
-        body = {:message => "Success!", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
+        body = {:message => "You have successfully registered!", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
       else
         body = {:message => "Invalid inputs. Make sure to enter a valid ID with at least 6 digits."}
       end
