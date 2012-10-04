@@ -33,11 +33,11 @@ class ApplicationController < ActionController::Base
         body = {:message => "Invalid name/game_id combination."}
       end
     elsif Status.first.registration # If registration is still toggled on
-      player = Player.new(:name => name, :game_id => game_id)
+      player = Player.new(:name => name, :game_id => game_id, :stack => 100)
       if player.valid?          # Checks if name and game_id are unique and valid
         player.player_key = Digest::MD5.hexdigest("#{player.name} #{player.game_id} TREY")  #player key assigned
         player.save
-        body = {:message => "You have successfully registered!", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
+        body = {:message => "Success!", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
       else
         body = {:message => "Invalid inputs. Make sure to enter a valid ID with at least 6 digits."}
       end
@@ -49,9 +49,10 @@ class ApplicationController < ActionController::Base
 
 private
   def call_rake(task, options = {})
+    logger.info "calling rake #{ task }"
     options[:rails_env] ||= Rails.env
     args = options.map { |n, v| "#{n.to_s.upcase}='#{v}'" }
-    system "/usr/bin/rake #{task} #{args.join(' ')} --trace 2>&1 >> #{Rails.root}/log/rake.log &"
+    system "rake #{task} #{args.join(' ')} --trace 2>&1 >> #{Rails.root}/log/rake.log &"
   end
   
 end

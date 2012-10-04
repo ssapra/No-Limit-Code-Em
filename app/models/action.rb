@@ -82,12 +82,12 @@ class Action < ActiveRecord::Base
     PlayerActionLog.create(:hand_id => player.round.id, :betting_round_id => player.bettingid_check, :player_id => player.id, :action => raw_action, :amount => raw_parameter, :comment => "Invalid Action")
   end
   
-  def self.record_fold(player)
+  def self.record_fold(player, comment = nil)
     player.action = "fold"
     player.in_round = false
     player.save
     player.remove_from_pot
-    PlayerActionLog.create(:hand_id => player.round.id, :betting_round_id => player.bettingid_check, :player_id => player.id, :action => "fold") 
+    PlayerActionLog.create(:hand_id => player.round.id, :betting_round_id => player.bettingid_check, :player_id => player.id, :action => "fold", :comment => comment) 
   end
   
 end
