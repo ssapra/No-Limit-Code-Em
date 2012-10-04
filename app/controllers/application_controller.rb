@@ -20,33 +20,29 @@ class ApplicationController < ActionController::Base
   end
       
   
-  def respond_to_request(player)
-    if player.player_key
-      
-      temp_player = Player.find_by_name(player.name)      
-      if Digest::MD5.hexdigest("#{temp_player.name} #{temp_player.game_id} TREY") == player.player_key
+  def respond_to_request(name, game_id)
+    temp_player = Player.find_by_name_and_game_id(name, game_id)      
+    if temp_player
+      if Digest::MD5.hexdigest("#{temp_player.name} #{temp_player.game_id} TREY") == temp_player.player_key # If they are the correct player, 
         if Status.first.registration
           body = {:message => "You have already registered. Registration is closed. Waiting for game to begin."}
-        elsif Status.first.game
-          body = {:message => "It might be your turn."}
         else
-          body = {:message => "Registration is closed. Waiting for game to begin."}
+          body = {:message => "Game is about to begin."}
         end
       else 
-        body = {:message => "Invalid inputs"}
+        body = {:message => "Invalid name/game_id combination."}
       end
-    else
-        if Status.first.registration
-          if player.valid? && player.game_id == 4
-            player.player_key = Digest::MD5.hexdigest("#{player.name} #{player.game_id} TREY")
-            player.save
-            body = {:message => "ok", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
-          else
-            body = {:message => "Invalid inputs"}
-          end
-        else
-          body = {:message => "Sorry, registration has closed"}
-        end
+    elsif Status.first.registration # If registration is still toggled on
+      player = Player.new(:name => name, :game_id => game_id)
+      if player.valid?          # Checks if name and game_id are unique and valid
+        player.player_key = Digest::MD5.hexdigest("#{player.name} #{player.game_id} TREY")  #player key assigned
+        player.save
+        body = {:message => "Success!", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
+      else
+        body = {:message => "Invalid inputs. Make sure to enter a valid ID with at least 6 digits."}
+      end
+    else                      # If registration is already closed, too bad
+      body = {:message => "Sorry, registration has closed."}
     end
     return body
   end

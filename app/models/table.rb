@@ -37,9 +37,9 @@ class Table < ActiveRecord::Base
   end
   
   def deal_cards 
-    player_ids = self.round.players_in.map {|player| player.id}
+    players = self.round.pot.players
+    player_ids = players.map {|player| player.id}
     dealer_position = player_ids.index(self.dealer_id)
-    players = self.round.players_in
     ordered_players = players.push(players.shift(dealer_position+1)).flatten   # Orders players based on dealer position
     5.times do 
         ordered_players.each do |player|    
@@ -105,11 +105,14 @@ class Table < ActiveRecord::Base
       if Status.first.waiting == true
         self.update_attributes(:waiting => true)
         if all_tables_ready?
+          logger.debug "RESHUFFLING"
           setup_tables
           Status.first.update_attributes(:waiting => false)
           Table.all.each do |table|
             table.begin_play
           end
+        else
+          logger.debug "NOT READY YET"
         end
       elsif (count_of_players == 1 && multiple_tables?) || (shuffle_to_one_table? && Table.all.count > 1) || standard_shuffle?
         Status.first.update_attributes(:waiting => true)
@@ -121,7 +124,7 @@ class Table < ActiveRecord::Base
                                :action => "won",
                                :comment => "First")
         Player.find_by_in_game(true).update_attributes(:losing_time => Time.now)
-        self.find_winners
+        #self.find_winners
         Table.destroy_all
         # Status.first.update_attributes(:game => false)
       else

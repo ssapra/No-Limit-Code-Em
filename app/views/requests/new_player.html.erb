@@ -1,0 +1,14 @@
+<%= form_for(@player, :url => "/", :method => :post) do |f| %>
+  <%#= f.error_messages %>
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :ID %><br />
+    <%= f.text_field :game_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit "Enter Tournament" %>
+  </div>
+<% end %>

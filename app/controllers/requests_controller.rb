@@ -7,14 +7,23 @@ class RequestsController < ApplicationController
     @players = Player.all
   end
   
+  def new_player
+    @player = Player.new
+  end
+  
   def registration
-    player = Player.new(:name => params["name"], :game_id => params["game_id"], :player_key => params["player_key"])
-   
-    body = respond_to_request(player)
+    logger.debug "received parameters"
+    if params[:player]
+      body = respond_to_request(params[:player][:name], params[:player][:game_id])
+    else
+      body = respond_to_request(params[:name], params[:game_id])
+    end
+    message = ["#{body[:message]}"]
+    if body[:player_key] then message << "Your player key is #{body[:player_key]}" end
     respond_to do |format|
-      format.html {render :json => body, :status => 200}
+      format.html {redirect_to root_path, flash.keep[:notice] => message}
+      format.json {render :json => body, :status => 200}
       format.xml {render :xml => body, :status => 200}
-      format.js
     end
   end
   

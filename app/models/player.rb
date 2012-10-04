@@ -15,6 +15,7 @@ class Player < ActiveRecord::Base
                   
   serialize :hand
   validates :name, :uniqueness => true 
+  validates :game_id, :uniqueness => true
   belongs_to :seat
   
   def table

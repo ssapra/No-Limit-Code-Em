@@ -34,16 +34,16 @@ class Round < ActiveRecord::Base
   end
   
   def start_betting
-    # ids = []
-    #     self.players_in.each do |player| 
-    #       if player.stack > 0
-    #         ids << player.id
-    #       end
-    #     end
     if self.all_but_one_in?
       self.determine_winner
       self.table.reset_players
     elsif self.anyone_is_all_in?
+      ids = []
+      self.players_in.each do |player| 
+        if player.stack > 0
+          ids << player.id
+        end
+      end
       Pot.create(:total => 0, :round_id => self.id, :player_ids => ids)
       self.next_action
     else
@@ -79,10 +79,9 @@ class Round < ActiveRecord::Base
                                :amount => ante)
       else
         pot.update_attributes(:total => total += player.stack)   
-        player.stack-= player.stack
-        player.bet+= player.stack
-        player.save
-        PlayerActionLog.create(:hand_id => self.round.id,
+        player.remove_from_pot
+        player.update_attributes(:in_game => false, :in_round => false, :losing_time => Time.now)
+        PlayerActionLog.create(:hand_id => self.id,
                                :player_id => player.id,
                                :action => "lost",
                                :comment => "could not match ante")
