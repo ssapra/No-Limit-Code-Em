@@ -34,7 +34,7 @@ class RequestsController < ApplicationController
       if player && verify_player?(player, params[:player_key])                               
         table = player.table
         body = {}
-        if table != nil # TABLE IS STILL ALIVE OR TABLE IS WAIITNG TO RESHUFFLE
+        if table != nil && table.game_over != true # TABLE IS STILL ALIVE OR TABLE IS WAIITNG TO RESHUFFLE
           
           round = table.round
           
@@ -64,7 +64,8 @@ class RequestsController < ApplicationController
            first = PlayerActionLog.find_by_comment("First")
            if first # TOURNAMENT IS OVER
              summary = player_standings
-             previous_winner = capture_round_summary_data(HandLog.last.hand_id)
+             table = Table.first
+             previous_winner = round_summary(table, table.round)
              body = {:message => "Tournament is Over", :winning_summary => summary, :round_summary => previous_winner, :game_over => true}
            else # TOURNAMENT IS STILL GOING
              previous_winner = players_last_summary(player.id)

@@ -29,13 +29,17 @@ module RequestsHelper
   
   def round_summary(table, round)
     logs = HandLog.find_all_by_table_id(table.id)
-    if logs.length > 1 && round.second_bet == false || table.waiting
+    if logs.length > 1 && round.second_bet == false || table.waiting ||
       if table.waiting
+        previous_round_id = logs[logs.length - 2].hand_id
         round_id = logs.last.hand_id
       else
+        if logs.length > 2 then previous_round_id = logs[logs.length - 3].hand_id end
         round_id = logs[logs.length - 2].hand_id
       end
-      return capture_round_summary_data(round_id)
+      last_round = capture_round_summary_data(round_id) 
+      previous_round = capture_round_summary_data(previous_round_id)
+      if previous_round then return [previous_round, last_round] else return last_round end
     end
   end
   
@@ -57,22 +61,22 @@ module RequestsHelper
       if action.action == "win"
         "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
       else
-        "#{player_name} lost"
+        "#{player_name} lost -- #{action.comment}"
       end
     end
     return round_summary
   end
   
   def players_last_summary(player_id)
-    winning_action = PlayerActionLog.find_all_by_player_id_and_action(player_id, ["win","lost"]) # How to stop this from happening each time they ping me?
-    previous_winner = winning_action.map do |action|
-      player_name = Player.find_by_id(action.player_id).name
-      if action.action == "win"
-        "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
-      else
-        "#{player_name} lost"
+    winning_action = PlayerActionLog.find_all_by_player_id_and_action(player_id, ["win","lost"])
+    previous_winner = winning_action.map do |action|  
+        player_name = Player.find_by_id(action.player_id).name
+        if action.action == "win"
+          "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
+        else
+          "#{player_name} lost -- #{action.comment}"
+        end
       end
-    end
     return previous_winner
   end
   

@@ -129,7 +129,8 @@ class Player < ActiveRecord::Base
   end
   
   def remove_from_pot
-    self.round.pots.each do |pot|
+    for pot in self.round.pots
+      pot.reload
       pot.player_ids.delete(self.id)
       pot.save
     end

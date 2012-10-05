@@ -35,6 +35,7 @@ class Round < ActiveRecord::Base
       self.start_betting
     else 
       self.determine_winner
+      self.table.reset_players
     end
   end
   
@@ -58,14 +59,14 @@ class Round < ActiveRecord::Base
   
   def set_dealer
     if self.table.dealer_id
-      seat = Player.find_by_id(self.table.dealer_id).seat
+      seat = Seat.find_by_id(self.table.dealer_id)
       next_seat = seat.next_seat("replace")  #Just to let it pass
-      self.table.update_attributes(:dealer_id => next_seat.player.id )        # Next dealer set up
+      self.table.update_attributes(:dealer_id => next_seat.id )        # Next dealer set up; Dealer id is the id of the seat.
       return next_seat.id
     else
-      self.table.update_attributes(:dealer_id => self.players_in[0].id)     # First dealer is set at first player in array
-      seat = Player.find_by_id(self.table.dealer_id).seat
-      return seat.id
+      seat_id = self.table.seats.first.id
+      self.table.update_attributes(:dealer_id => seat_id)     # First dealer is set at first player in array
+      return seat_id
     end
   end
   
@@ -73,6 +74,7 @@ class Round < ActiveRecord::Base
     pot = self.pot
     total = pot.total
     self.players_in.each do |player|
+      pot.reload
       if player.stack >= ServerApp::Application.config.ANTE
         ante = ServerApp::Application.config.ANTE
         pot.update_attributes(:total => total += ante)   
@@ -112,7 +114,7 @@ class Round < ActiveRecord::Base
       seat = Player.find_by_id(self.table.turn_id).seat
       return seat.next_seat(action)                       # If turn_id exists, next active player's seat is sent back
     else                                          # If there's already a dealer, the person left of the dealer starts betting
-      seat = Player.find_by_id(self.table.dealer_id).seat
+      seat = Seat.find_by_id(self.table.dealer_id)
       return seat.next_seat(action)
     end
   end

@@ -38,18 +38,26 @@ class Table < ActiveRecord::Base
   
   def deal_cards 
     round.pot.reload
-    players = self.round.pot.players
-    logger.debug "players to be dealt: #{players}"
-    player_ids = players.map {|player| player.id}
-    dealer_position = player_ids.index(self.dealer_id)
-    ordered_players = players.push(players.shift(dealer_position+1)).flatten   # Orders players based on dealer position
+    seats = self.seats
+    logger.debug "players to be dealt: #{seats.inspect}"
+    seat_ids = seats.map {|seat| seat.id if seat.player}
+    dealer_position = seat_ids.index(self.dealer_id)
+    ordered_seats = seats.push(seats.shift(dealer_position+1)).flatten   # Orders players based on dealer position
+    dealer = Seat.find_by_id(self.dealer_id)
+    if dealer.player.in_game == false
+      ordered_seats.delete(Seat.find_by_id(self.dealer_id))
+    end
+    ordered_players = ordered_seats.map {|seat| Player.find_by_id(seat.player_id)}
+    live_players = ordered_players.map {|player| player if player.in_game}
+    live_players -= [nil]
+    logger.debug "players really being dealt: #{live_players.inspect}"
     5.times do 
-        ordered_players.each do |player|    
+        live_players.each do |player| 
           player.hand << self.deal
           player.save!
       end
     end
-    log_dealt_cards(ordered_players)
+    log_dealt_cards(live_players)
   end
   
   def deal
@@ -68,7 +76,8 @@ class Table < ActiveRecord::Base
       player.losing_time = Time.now
       PlayerActionLog.create(:hand_id => self.round.id,
                              :player_id => player.id,
-                             :action => "lost")
+                             :action => "lost",
+                             :comment => "no more chips")
       player.in_game = false
       player.seat.player_id = nil
       player.in_round = false
@@ -127,7 +136,7 @@ class Table < ActiveRecord::Base
                                :comment => "First")
         Player.find_by_in_game(true).update_attributes(:losing_time => Time.now)
         #self.find_winners
-        Table.destroy_all
+        Table.first.update_attributes(:game_over => true)
         # Status.first.update_attributes(:game => false)
       else
         logger.debug "DEALING CARDS FOR NEXT ROUND"
@@ -220,8 +229,6 @@ class Table < ActiveRecord::Base
           return false
         end
       end
-      ServerApp::Application.config.ROUND_LIMIT += 5
-      logger.debug "#{ServerApp::Application.config.ROUND_LIMIT}"
       return true
     end
   end
