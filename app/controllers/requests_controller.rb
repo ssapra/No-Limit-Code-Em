@@ -21,9 +21,10 @@ class RequestsController < ApplicationController
     message = "#{body[:message]}"
     if body[:player_key] then message += " Your player key is #{body[:player_key]}" end
     flash[:notice] = message
+    logger.debug "body: #{body}"
     respond_to do |format|
-      format.html {redirect_to root_path}
       format.json {render :json => body, :status => 200}
+      format.html {redirect_to root_path}
       format.xml {render :xml => body, :status => 200}
     end
   end
@@ -67,9 +68,11 @@ class RequestsController < ApplicationController
              table = Table.first
              previous_winner = round_summary(table, table.round)
              body = {:message => "Tournament is Over", :winning_summary => summary, :round_summary => previous_winner, :game_over => true}
+             logger.debug "Body : #{body.inspect}"  
            else # TOURNAMENT IS STILL GOING
              previous_winner = players_last_summary(player.id)
              body = {:message => "You're out", :round_summary => previous_winner}
+             logger.debug "Body : #{body.inspect}"  
            end
         end
       end

@@ -29,8 +29,8 @@ module RequestsHelper
   
   def round_summary(table, round)
     logs = HandLog.find_all_by_table_id(table.id)
-    if logs.length > 1 && round.second_bet == false || table.waiting ||
-      if table.waiting
+    if (logs.length > 1 && round.second_bet == false) || table.waiting || Table.all.count == 1
+      if table.waiting || table.game_over
         previous_round_id = logs[logs.length - 2].hand_id
         round_id = logs.last.hand_id
       else
@@ -59,7 +59,7 @@ module RequestsHelper
     round_summary = winning_action.map do |action|
       player_name = Player.find_by_id(action.player_id).name
       if action.action == "win"
-        "#{player_name} won #{action.amount} chips #{action.comment} for Hand ##{action.hand_id}"
+        "#{player_name} won #{action.amount} chips#{action.comment} for Hand ##{action.hand_id}"
       else
         "#{player_name} lost -- #{action.comment}"
       end
