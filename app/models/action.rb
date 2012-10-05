@@ -14,7 +14,9 @@ class Action < ActiveRecord::Base
     round = player.round
     min_bet = round.minimum_bet
     minimum_stack = round.smallest_stack
-    if min_bet == player.bet && bet <= player.stack && bet <= minimum_stack
+    if bet == 0
+      Action.save_player_action(player, "check", 0)
+    elsif min_bet == player.bet && bet <= player.stack && bet <= minimum_stack
       Action.save_player_action(player, "bet", bet)
     elsif min_bet == player.bet && bet <= player.stack && bet > minimum_stack
       Action.record_raw_action(player, action, parameter)
