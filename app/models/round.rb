@@ -73,7 +73,7 @@ class Round < ActiveRecord::Base
   def ante_up
     pot = self.pot
     total = pot.total
-    self.players_in.each do |player|
+    self.table.order_players.each do |player|
       pot.reload
       if player.stack >= ServerApp::Application.config.ANTE
         ante = ServerApp::Application.config.ANTE
@@ -216,11 +216,17 @@ class Round < ActiveRecord::Base
       if winners.count == 1
         winners[0].stack += pot.total
         winners[0].save
-        PlayerActionLog.create(:hand_id => self.id,
-                               :player_id => winners[0].id,
-                               :action => "win",                                 
-                               :amount => pot.total,
-                               :comment => "with #{winners[0].hand}")
+        if winners[0].hand != []
+          hand = " with #{winners[0].hand}"
+        else
+          hand = nil
+        end
+          PlayerActionLog.create(:hand_id => self.id,
+                                 :player_id => winners[0].id,
+                                 :action => "win",                                 
+                                 :amount => pot.total,
+                                 :comment => hand)
+        
       else 
         division = winners.count
         logger.debug  "The pot is split #{division}-way."
@@ -231,7 +237,7 @@ class Round < ActiveRecord::Base
                                :player_id => winner.id,
                                :action => "win",
                                :amount => self.pot/division,
-                               :comment => "with #{winner.hand}")         
+                               :comment => " with #{winner.hand}")         
         end
       end
       

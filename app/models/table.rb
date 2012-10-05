@@ -38,6 +38,17 @@ class Table < ActiveRecord::Base
   
   def deal_cards 
     round.pot.reload
+    live_players = order_players
+    5.times do 
+        live_players.each do |player| 
+          player.hand << self.deal
+          player.save!
+      end
+    end
+    log_dealt_cards(live_players)
+  end
+  
+  def order_players
     seats = self.seats
     logger.debug "players to be dealt: #{seats.inspect}"
     seat_ids = seats.map {|seat| seat.id if seat.player}
@@ -48,16 +59,11 @@ class Table < ActiveRecord::Base
       ordered_seats.delete(Seat.find_by_id(self.dealer_id))
     end
     ordered_players = ordered_seats.map {|seat| Player.find_by_id(seat.player_id)}
+    ordered_players -= [nil]
     live_players = ordered_players.map {|player| player if player.in_game}
     live_players -= [nil]
     logger.debug "players really being dealt: #{live_players.inspect}"
-    5.times do 
-        live_players.each do |player| 
-          player.hand << self.deal
-          player.save!
-      end
-    end
-    log_dealt_cards(live_players)
+    return live_players
   end
   
   def deal
