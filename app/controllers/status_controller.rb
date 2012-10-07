@@ -40,7 +40,7 @@ class StatusController < ApplicationController
            end
            status.game = true
            status.save!
-           call_rake :timeout_bot
+           # call_rake :timeout_bot
          end
          respond_to do |format|
            format.html { redirect_to display_path }
