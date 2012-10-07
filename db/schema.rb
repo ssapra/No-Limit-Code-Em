@@ -61,18 +61,18 @@ ActiveRecord::Schema.define(:version => 20121007192921) do
   end
 
   create_table "players", :force => true do |t|
-    t.integer  "game_id",     :limit => 255
+    t.integer  "game_id"
     t.string   "name"
     t.string   "player_key"
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
-    t.text     "hand",                       :default => "'"
-    t.integer  "bet",                        :default => 0
-    t.integer  "stack",                      :default => 500
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.text     "hand",        :default => "'"
+    t.integer  "bet",         :default => 0
+    t.integer  "stack",       :default => 500
     t.string   "action"
-    t.boolean  "in_game",                    :default => true
-    t.boolean  "in_round",                   :default => true
-    t.boolean  "turn",                       :default => false
+    t.boolean  "in_game",     :default => true
+    t.boolean  "in_round",    :default => true
+    t.boolean  "turn",        :default => false
     t.integer  "table_id"
     t.integer  "seat_id"
     t.boolean  "replacement"
