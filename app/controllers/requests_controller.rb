@@ -83,7 +83,6 @@ class RequestsController < ApplicationController
     respond_to do |format|
       format.html {render :json => body, :status => 200}
       format.xml  {render :xml => body, :status => 200}
-      format.js
     end
   end
   

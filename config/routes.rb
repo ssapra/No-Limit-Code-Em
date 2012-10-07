@@ -12,4 +12,12 @@ ServerApp::Application.routes.draw do
   get "/game_state" => 'requests#state', :as => :states #player asks for state
   post "/player" => 'requests#player_turn' #player sends action here
   
+  ####### Sandbox Routes
+  
+  post "/sandbox/betting_round" => 'sandbox#action'
+  
+  get "/sandbox/current_turn" => 'sandbox#current_turn'
+  get "/sandbox/game_over" => 'sandbox#game_over'
+  
+  
 end
