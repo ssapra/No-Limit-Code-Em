@@ -271,6 +271,7 @@ class Round < ActiveRecord::Base
   
   def smallest_stack
     smallest_stack = 10000
+    return 0 unless self.pot
     self.pot.players.each do |player|
       if player.stack <= smallest_stack
         smallest_stack = player.stack
