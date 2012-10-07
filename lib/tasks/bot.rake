@@ -28,9 +28,10 @@ namespace :bot do
     Net::HTTP.new(ENV['server'] || 'localhost', ENV['port'] || 3000).start do |http|
 
       request = Net::HTTP::Post.new("/")
-      request.set_form_data(:name => name, :game_id => 4)
+      request.set_form_data(:name => name, :game_id => 1000000+rand(10000))
    
       response = http.request request
+      puts "response: #{response.body}\n"
 
       player_json = JSON.parse(response.body)
       key = player_json["player_key"]
