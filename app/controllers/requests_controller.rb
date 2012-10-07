@@ -41,19 +41,20 @@ class RequestsController < ApplicationController
           
           if table.turn_id 
             current_player = Player.find_by_id(table.turn_id)
-            body.merge!({:current_player => current_player.name, :replacement => current_player.replacement})
+            smallest_stack = round.smallest_stack
+            body.merge!({
+              :current_player => current_player.name,
+              :replacement => current_player.replacement,
+              :min_bet => round.minimum_bet,
+              :max_bet => smallest_stack,
+              :max_raise => [player.stack - (round.minimum_bet - player.bet), smallest_stack].min,
+              :pot => round.total_pot, 
+              :hand => player.hand,
+              :bet => player.bet })
           end
           
-          smallest_stack = round.smallest_stack
-          
-          body.merge!({:hand => player.hand, 
-                     :bet => player.bet, 
-                     :min_bet => round.minimum_bet,
-                     :max_bet => smallest_stack,
-                     :max_raise => [player.stack - (round.minimum_bet - player.bet), smallest_stack].min,
-                     :stack => player.stack, 
-                     :pot => round.total_pot, 
-                     :table_id => table.id})
+          body.merge!({ :stack => player.stack, 
+                        :table_id => table.id})
                      
           body[:betting_summary] = betting_summary(round)
           body[:replacement_summary] = replacement_summary(round)        
