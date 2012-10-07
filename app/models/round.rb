@@ -29,11 +29,11 @@ class Round < ActiveRecord::Base
     Pot.create(:total => 0, :round_id => self.id, :player_ids => player_ids)
     self.ante_up
     logger.debug "players :#{pot.players.inspect}"
-    if pot.players.count > 1  
+    if pot.players.count > 1 # Considers if there are at least 2 people in the game.
       self.table.deal_cards
       self.table.save
       self.start_betting
-    else 
+    else                    # Goes straight to result summary if only 1 player has more than at this point.
       self.determine_winner
       self.table.reset_players
     end
