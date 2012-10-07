@@ -20,6 +20,13 @@ To set up your environment locally, make sure to run rake db:seed to set up the 
 'K' = King
 'A' = Ace
 
+===Poker Hand Ranking
+
+====Royal Flush
+
+A straight from a ten to an ace with all five cards of the same suit. In poker all suits are ranked equally.
+[ Ah, Kh, Qh, Jh, Th ]
+
 ===No Limit Code 'Em Tournament Rules
 
 * 1.	Only 1 student can register per team. Teams must have 2 people.
