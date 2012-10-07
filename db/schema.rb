@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121004192350) do
+ActiveRecord::Schema.define(:version => 20121007192921) do
 
   create_table "admins", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
@@ -78,6 +78,8 @@ ActiveRecord::Schema.define(:version => 20121004192350) do
     t.boolean  "replacement"
     t.datetime "losing_time"
   end
+
+  add_index "players", ["name"], :name => "index_players_on_name"
 
   create_table "pots", :force => true do |t|
     t.integer  "total"
