@@ -28,8 +28,6 @@ To set up your environment locally, make sure to run rake db:seed to set up the 
 
 == Poker Hand Ranking
 
-http://img.rankplan.net/p/3/pokerhands_big.jpg
-
 === Royal Flush
 
 A straight from a ten to an ace with all five cards of the same suit. In poker all suits are ranked equally.
@@ -92,14 +90,14 @@ Ah, Ks, Qd, Jc, 9s
 
 == How to Play Five Card Draw
 
-  1. Players ante up (place a small bet in the pot).
-  2. Starting with the player to the dealer's left, the dealer deals each player five cards, face down.
-  3. Everyone picks up their cards from the table and checks out what they have got.
-  4. There is a round of betting, starting with the player to the dealer's left.
-  5. When the betting is done, those who are still in the hand get to trade in one, two, or three cards from their hand for new ones. If a player has an ace, he/she can trade in the other four cards in his/her hand, but usually has to show the ace.
-     * Note: You do not have to trade any cards - if you have already got good hand, you will want to "stand pat" and keep the cards you were first dealt.
-  6. After everyone receives their new cards, there is another round of betting, starting to the dealer's left.
-  7. After the betting is completed, players show their hands and the best hand wins the pot.
+1. Players ante up (place a small bet in the pot).
+2. Starting with the player to the dealer's left, the dealer deals each player five cards, face down.
+3. Everyone picks up their cards from the table and checks out what they have got.
+4. There is a round of betting, starting with the player to the dealer's left.
+5. When the betting is done, those who are still in the hand get to trade in one, two, or three cards from their hand for new ones. If a player has an ace, he/she can trade in the other four cards in his/her hand, but usually has to show the ace.
+   * Note: You do not have to trade any cards - if you have already got good hand, you will want to "stand pat" and keep the cards you were first dealt.
+6. After everyone receives their new cards, there is another round of betting, starting to the dealer's left.
+7. After the betting is completed, players show their hands and the best hand wins the pot.
 
 == No Limit Code 'Em Tournament Rules
 
