@@ -98,6 +98,7 @@ class Round < ActiveRecord::Base
   
   def minimum_bet
     min_bet = 0
+    return unless self.pot
     self.pot.reload
     self.pot.players.each do |player|
       if player.bet > min_bet # Checks the bets of players who have bet
