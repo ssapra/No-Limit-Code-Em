@@ -28,7 +28,7 @@ class Action < ActiveRecord::Base
     end
   end
   
-  def self.call(player, action, paramter)
+  def self.call(player, action, parameter)
     min_bet = player.round.minimum_bet
     bet = min_bet - player.bet
     if bet <= player.stack  
