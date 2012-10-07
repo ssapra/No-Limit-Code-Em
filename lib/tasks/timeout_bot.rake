@@ -20,7 +20,7 @@ def run_timeout_bot!
       next unless last_play = PlayerActionLog.find_all_by_hand_id(hand_id).last
       # puts "    Last Play: #{ last_play.inspect }"
       last_play_time = last_play.created_at
-      if Time.now - last_play_time > 5
+      if Time.now - last_play_time > 6 # covers race condition
         next unless current_player = Player.find_by_id(active_table.turn_id)
         puts "    FORCE FOLD FOR PLAYER #{ current_player.id }"
         Action.record_fold(current_player, "fold_by_timeout_bot")
