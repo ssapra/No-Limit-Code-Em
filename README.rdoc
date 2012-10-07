@@ -4,7 +4,7 @@ To set up your environment locally, make sure to run rake db:seed to set up the 
 
 =Rules
 
-===No Limit Code ‘Em – Tournament Rules
+===No Limit Code 'Em Tournament Rules
 
 * 1.	Only 1 student can register per team. Teams must have 2 people.
 * 2.	Once registration is declared to be open, you must register at http://enovapoker.herokuapp.com/registration with your name and game_id.
@@ -12,7 +12,7 @@ To set up your environment locally, make sure to run rake db:seed to set up the 
 ** b.	Your game_id MUST be an actual id number that you have on your person. This game_id will prove that the winner is you should you place in the top 3.
 ** c.	Your player key is returned to you upon being registered. This player key must be saved and kept hidden from other teams.
 * 3.	In order to properly send your requests, you must include the player key in your requests. We will give everyone about 15 minutes to make sure they can start making get requests before the tournament is started.
-* 4.	You have 5 seconds to respond back to the server with your action once the server has declared it is your turn. If you do not respond, the server will set your action as a “fold” and you will wait until the next round to begin play.
+* 4.	You have 5 seconds to respond back to the server with your action once the server has declared it is your turn. If you do not respond, the server will set your action as a fold and you will wait until the next round to begin play.
 * 5.	You must make the correct move otherwise you will be forced to fold your hand. 
 ** a.	Ex. If you bet 200 when you only have 150 chips, you will fold.
 ** b.	Ex. If you call when the minimum bet and your bet are the same, that is the wrong response because a check is expected.
@@ -33,14 +33,15 @@ The url that you have to point your program towards is http://enovapoker.herokua
 
 In order to make your move, you must make a POST request to http://enovapoker.herokuapp.com/player. The parameters that are expected are 
 
-* a.	Name (ex. “John”)
+* a.	Name (ex. John)
 * b.	game_id (ex. 12342314)
-* c.	player_key (ex. “23fejf2980jf203jdwij”)
-* d.	player_action (ex. “bet”, “replace”, “call”)
-* e.	parameters (ex. “45”, “20”, “345”)
-** a.	When you are determining which cards to replace, set parameters to be “123” to replace your first, second, and third card.
+* c.	player_key (ex. 23fejf2980jf203jdwij)
+* d.	player_action (ex. "bet", "replace", "call")
+* e.	parameters (ex. "45", "20", "345")
+** a.	When you are determining which cards to replace, set parameters to be "123" to replace your first, second, and third card.
 
  
 Prizes
 
-* 1. There will be 3 winners – First, Second, and Third place. 
+* 1. There will be 3 winners - First, Second, and Third place. 
+
