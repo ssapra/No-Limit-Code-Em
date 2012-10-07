@@ -31,12 +31,62 @@ To set up your environment locally, make sure to run rake db:seed to set up the 
 === Royal Flush
 
 A straight from a ten to an ace with all five cards of the same suit. In poker all suits are ranked equally.
+
 Ah, Kh, Qh, Jh, Th
 
 === Straight Flush
 
 Any straight with all five cards of the same suit.
+
 9c, 8c, 7c, 6c, 5c
+
+=== Four of a Kind
+
+Any four cards of the same rank. If two players share the same Four of a Kind, the bigger fifth card (known as the kicker) decides who wins the pot.
+
+Ah, As, Ad, Ac, Kh
+
+=== Full House
+
+Any three cards of the same rank together with any two cards of the same rank. Our example shows "Aces full of Kings" and it is a bigger full house than "Kings full of Aces."
+
+Ah, Ac, Ad, Kh, Kc
+
+=== Flush
+
+Any five cards of the same suit (not consecutive). The highest card of the five determines the rank of the flush. Our example shows an Ace-high flush, which is the highest possible.
+
+As, Ts, 7s, 6s, 2s
+
+=== Straight
+
+Any five consecutive cards of different suits. Aces can count as either a high or a low card. Our example shows a five-high straight, which is the lowest possible straight.
+
+5c, 4d, 3s, 2h, Ah
+
+=== Three of a Kind
+
+Any three cards of the same rank. Our example shows three-of-a-kind Aces, with a King and a Queen as side cards - the best possible three of a kind.
+
+Ah, As, Ad, Ks, Qc
+
+=== Two Pair
+
+Any two cards of the same rank together with another two cards of the same rank. Our example shows the best possible two-pair, Aces and Kings. The highest pair of the two determines the rank of the two-pair.
+
+Ah, As, Kc, Kh, Qs
+
+=== One Pair
+
+Any two cards of the same rank. Our example shows the best possible one-pair hand.
+
+Ah, As, Kh, Qs, Jd
+
+=== High Card
+
+Any hand not in the above-mentioned hands. Our example shows the best possible high-card hand.
+
+Ah, Ks, Qd, Jc, 9s
 
 == No Limit Code 'Em Tournament Rules
 
