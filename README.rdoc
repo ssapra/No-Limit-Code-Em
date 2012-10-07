@@ -96,7 +96,7 @@ Ah, Ks, Qd, Jc, 9s
 2. Starting with the player to the dealer's left, the dealer deals each player five cards, face down.
 3. Everyone picks up their cards from the table and checks out what they have got.
 4. There is a round of betting, starting with the player to the dealer's left.
-5. When the betting is done, those who are still in the hand get to trade in one, two, or three cards from their hand for new ones. If a player has an ace, he/she can trade in the other four cards in his/her hand, but usually has to show the ace.
+5. When the betting is done, those who are still in the hand get to trade in one, two, or three cards from their hand for new ones.
    * Note: You do not have to trade any cards - if you have already got good hand, you will want to "stand pat" and keep the cards you were first dealt.
 6. After everyone receives their new cards, there is another round of betting, starting to the dealer's left.
 7. After the betting is completed, players show their hands and the best hand wins the pot.
