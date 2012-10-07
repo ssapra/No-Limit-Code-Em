@@ -12,6 +12,7 @@ def run_timeout_bot!
   sleep 6
   while Status.first.game do
     Table.all.each do |active_table|
+      next unless active_table.turn_id
       puts "  Table #{ active_table.id }"
       next unless current_hand_log = HandLog.find_all_by_table_id(active_table.id).last
       # puts "    Hand Log: #{ current_hand_log.inspect }"
