@@ -107,6 +107,7 @@ GEM
       rack
     rack-test (0.6.1)
       rack (>= 1.0)
+    rack-timeout (0.0.3)
     rails (3.2.8)
       actionmailer (= 3.2.8)
       actionpack (= 3.2.8)
@@ -185,6 +186,7 @@ DEPENDENCIES
   jquery-rails
   newrelic_rpm
   pg
+  rack-timeout
   rails (= 3.2.8)
   rspec-mocks
   rspec-rails (~> 2.11.0)

@@ -56,9 +56,12 @@ class RequestsController < ApplicationController
           body.merge!({ :stack => player.stack, 
                         :table_id => table.id})
                      
-          body[:betting_summary] = betting_summary(round)
-          body[:replacement_summary] = replacement_summary(round)        
-          body[:round_summary] = round_summary(table, round)
+          if round
+            body[:betting_summary] = betting_summary(round)
+            body[:replacement_summary] = replacement_summary(round)        
+            body[:round_summary] = round_summary(table, round)
+          end
+
           body[:play] = verify_player_turn?(player)
           body.merge!({:waiting => true, :message => "Tables are about to reshuffle..."}) if table.waiting
           logger.debug "Body : #{body.inspect}"  

@@ -255,7 +255,7 @@ class Round < ActiveRecord::Base
   end
   
   def players_in
-    self.table.players.select {|player| player.in_round}
+    self.table.players.where(:in_round => true).reload
   end
   
   def players_ready?
