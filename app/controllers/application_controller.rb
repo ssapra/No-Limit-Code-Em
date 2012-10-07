@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
         player.save
         body = {:message => "You have successfully registered!", :player_key => player.player_key, :player_name => player.name, :game_id => player.game_id}
       else
-        body = {:message => "Invalid inputs. Make sure to enter a valid ID with at least 6 digits."}
+        body = {:message => "Invalid inputs. Make sure to enter a unique name/ID with at least 5 characters."}
       end
     else                      # If registration is already closed, too bad
       body = {:message => "Sorry, registration has closed."}

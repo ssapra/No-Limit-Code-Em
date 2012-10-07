@@ -14,8 +14,8 @@ class Player < ActiveRecord::Base
                   :losing_time
                   
   serialize :hand
-  validates :name, :uniqueness => true 
-  validates :game_id, :uniqueness => true
+  validates :name, :presence => true, :uniqueness => true, :length => { :minimum => 5, :maximum => 20 }
+  validates :game_id, :presence => true, :uniqueness => true, :length => { :minimum => 5, :maximum => 20 }
   belongs_to :seat
   
   def table
