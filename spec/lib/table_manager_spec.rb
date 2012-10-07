@@ -74,7 +74,7 @@ describe TableManager do
    end
 
    it "should correctly assign a random number of players" do
-     size = Random.rand(1..200)
+     size = (1..200).to_a.sample 
      players = (0..size).map{|i| i}
      table_size = 6
      tables = TableManager.assign(players, table_size)

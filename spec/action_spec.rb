@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Action do
   
   describe "#self.check" do
-    it "should save the player's check if they can check" do
+    pending "should save the player's check if they can check" do
       player = Player.create(:bet => 0)
       player.stub(:action)
       player.stub(:stack => 0)

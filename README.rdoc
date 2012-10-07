@@ -2,37 +2,118 @@
 
 To set up your environment locally, make sure to run rake db:seed to set up the game statuses.
 
-=Rules
-
-===Suit Lookup
+== Suit Lookup
 
 'c' = Club
+
 'd' = Diamond
+
 'h' = Heart
+
 's' = Spade
 
-===Face Values
+== Face Values
 
-[ 2, 3, 4, 5, 6, 7, 8, 9 ] = Same as face value.
+'2', '3', '4', '5', '6', '7', '8', '9' = Same as face value.
+
 'T' = 10
+
 'J' = Jack
+
 'Q' = Queen
+
 'K' = King
+
 'A' = Ace
 
-===No Limit Code 'Em Tournament Rules
+== Poker Hand Ranking
 
-* 1.	Only 1 student can register per team. Teams must have 2 people.
-* 2.	Once registration is declared to be open, you must register at http://enovapoker.herokuapp.com/registration with your name and game_id.
-** a.	The name can be any creative username or actual name.
-** b.	Your game_id MUST be an actual id number that you have on your person. This game_id will prove that the winner is you should you place in the top 3.
-** c.	Your player key is returned to you upon being registered. This player key must be saved and kept hidden from other teams.
-* 3.	In order to properly send your requests, you must include the player key in your requests. We will give everyone about 15 minutes to make sure they can start making get requests before the tournament is started.
-* 4.	You have 5 seconds to respond back to the server with your action once the server has declared it is your turn. If you do not respond, the server will set your action as a fold and you will wait until the next round to begin play.
-* 5.	You must make the correct move otherwise you will be forced to fold your hand. 
-** a.	Ex. If you bet 200 when you only have 150 chips, you will fold.
-** b.	Ex. If you call when the minimum bet and your bet are the same, that is the wrong response because a check is expected.
-** c.	Exception: If you bet 200 when you have 300 chips but the smallest   stack is 150, you will be cut down to bet 150 and allowed to stay in the game.	
+http://img.rankplan.net/p/3/pokerhands_big.jpg
+
+=== Royal Flush
+
+A straight from a ten to an ace with all five cards of the same suit. In poker all suits are ranked equally.
+
+Ah, Kh, Qh, Jh, Th
+
+=== Straight Flush
+
+Any straight with all five cards of the same suit.
+
+9c, 8c, 7c, 6c, 5c
+
+=== Four of a Kind
+
+Any four cards of the same rank. If two players share the same Four of a Kind, the bigger fifth card (known as the kicker) decides who wins the pot.
+
+Ah, As, Ad, Ac, Kh
+
+=== Full House
+
+Any three cards of the same rank together with any two cards of the same rank. Our example shows "Aces full of Kings" and it is a bigger full house than "Kings full of Aces."
+
+Ah, Ac, Ad, Kh, Kc
+
+=== Flush
+
+Any five cards of the same suit (not consecutive). The highest card of the five determines the rank of the flush. Our example shows an Ace-high flush, which is the highest possible.
+
+As, Ts, 7s, 6s, 2s
+
+=== Straight
+
+Any five consecutive cards of different suits. Aces can count as either a high or a low card. Our example shows a five-high straight, which is the lowest possible straight.
+
+5c, 4d, 3s, 2h, Ah
+
+=== Three of a Kind
+
+Any three cards of the same rank. Our example shows three-of-a-kind Aces, with a King and a Queen as side cards - the best possible three of a kind.
+
+Ah, As, Ad, Ks, Qc
+
+=== Two Pair
+
+Any two cards of the same rank together with another two cards of the same rank. Our example shows the best possible two-pair, Aces and Kings. The highest pair of the two determines the rank of the two-pair.
+
+Ah, As, Kc, Kh, Qs
+
+=== One Pair
+
+Any two cards of the same rank. Our example shows the best possible one-pair hand.
+
+Ah, As, Kh, Qs, Jd
+
+=== High Card
+
+Any hand not in the above-mentioned hands. Our example shows the best possible high-card hand.
+
+Ah, Ks, Qd, Jc, 9s
+
+== How to Play Five Card Draw
+
+1. Players ante up (place a small bet in the pot).
+2. Starting with the player to the dealer's left, the dealer deals each player five cards, face down.
+3. Everyone picks up their cards from the table and checks out what they have got.
+4. There is a round of betting, starting with the player to the dealer's left.
+5. When the betting is done, those who are still in the hand get to trade in one, two, or three cards from their hand for new ones.
+   * Note: You do not have to trade any cards - if you have already got good hand, you will want to "stand pat" and keep the cards you were first dealt.
+6. After everyone receives their new cards, there is another round of betting, starting to the dealer's left.
+7. After the betting is completed, players show their hands and the best hand wins the pot.
+
+== No Limit Code 'Em Tournament Rules
+
+1. Only 1 student can register per team. Teams must have 2 people.
+2. Once registration is declared to be open, you must register at http://enovapoker.herokuapp.com/registration with your name and game_id.
+   1. The name can be any creative username or actual name.
+   2.	Your game_id MUST be an actual id number that you have on your person. This game_id will prove that the winner is you should you place in the top 3.
+   3.	Your player key is returned to you upon being registered. This player key must be saved and kept hidden from other teams.
+3. In order to properly send your requests, you must include the player key in your requests. We will give everyone about 15 minutes to make sure they can start making get requests before the tournament is started.
+4. You have 5 seconds to respond back to the server with your action once the server has declared it is your turn. If you do not respond, the server will set your action as a fold and you will wait until the next round to begin play.
+5. You must make the correct move otherwise you will be forced to fold your hand. 
+   1.	Ex. If you bet 200 when you only have 150 chips, you will fold.
+   2.	Ex. If you call when the minimum bet and your bet are the same, that is the wrong response because a check is expected.
+   3.	Exception: If you bet 200 when you have 300 chips but the smallest stack is 150, you will be cut down to bet 150 and allowed to stay in the game.	
 
 
 ===Requests
@@ -49,15 +130,15 @@ The url that you have to point your program towards is http://enovapoker.herokua
 
 In order to make your move, you must make a POST request to http://enovapoker.herokuapp.com/player. The parameters that are expected are 
 
-* a.	Name (ex. John)
-* b.	game_id (ex. 12342314)
-* c.	player_key (ex. 23fejf2980jf203jdwij)
-* d.	player_action (ex. "bet", "replace", "call")
-* e.	parameters (ex. "45", "20", "345")
-** a.	When you are determining which cards to replace, set parameters to be "123" to replace your first, second, and third card.
+a.	Name (ex. John)
+b.	game_id (ex. 12342314)
+c.	player_key (ex. 23fejf2980jf203jdwij)
+d.	player_action (ex. "bet", "replace", "call")
+e.	parameters (ex. "45", "20", "345")
+  *	When you are determining which cards to replace, set parameters to be "123" to replace your first, second, and third card.
 
  
-Prizes
+==Prizes
 
-* 1. There will be 3 winners - First, Second, and Third place. 
+There will be 3 winners - First, Second, and Third place. 
 
