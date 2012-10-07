@@ -4,6 +4,22 @@ To set up your environment locally, make sure to run rake db:seed to set up the 
 
 =Rules
 
+===Suit Lookup
+
+'c' = Club
+'d' = Diamond
+'h' = Heart
+'s' = Spade
+
+===Face Values
+
+[ 2, 3, 4, 5, 6, 7, 8, 9 ] = Same as face value.
+'T' = 10
+'J' = Jack
+'Q' = Queen
+'K' = King
+'A' = Ace
+
 ===No Limit Code 'Em Tournament Rules
 
 * 1.	Only 1 student can register per team. Teams must have 2 people.
