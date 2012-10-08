@@ -18,6 +18,10 @@ class Table < ActiveRecord::Base
   has_many :players, :through => :seats
   has_many :rounds, :dependent => :destroy
   
+  def self.create_with_new_deck
+    Table.create(:deck => Deck.new, :waiting => false)
+  end
+
   def round
     if self.rounds
       self.rounds.last

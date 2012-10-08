@@ -1,5 +1,3 @@
-include RubyPoker
-
 desc "Starts the poker game"
 task :start_game => :environment do
   start_game_thread = Thread.new do
@@ -40,7 +38,7 @@ def setup_tables
   table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE)
   logger.debug "#{table_list}"
   table_list.each do |player_ids|
-    table = Table.create(:deck => Deck.new, :waiting => false)
+    table = Table.create_with_new_deck
     player_ids.each do |id|
       seat = Seat.create(:table_id => table.id, :player_id => id)
       Player.find_by_id(id).update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
