@@ -13,7 +13,8 @@ def start_game!
   PlayerActionLog.destroy_all
   HandLog.destroy_all
   PlayerStateLog.destroy_all
-  Status.first.update_attributes(:waiting => false)
+  status = Status.first
+  status.update_attributes(:waiting => false)
   if Player.all.count > 1
    setup_tables
    Table.all.each do |table|
