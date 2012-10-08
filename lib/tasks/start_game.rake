@@ -1,11 +1,11 @@
-desc "Runs timeout bot"
+desc "Starts the poker game"
 task :start_game => :environment do
-  timeout_bot_thread = Thread.new do
+  start_game_thread = Thread.new do
     # logger.info "\nStarting timeout bot."
     start_game!
     # logger.info "\nTimeout bot spinning down."
   end
-  timeout_bot_thread.join
+  start_game_thread.join
 end
 
 
