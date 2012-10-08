@@ -23,8 +23,13 @@ def run_timeout_bot!
       if Time.now - last_play_time > 6 # covers race condition
         next unless current_player = Player.find_by_id(active_table.turn_id)
         puts "    FORCE FOLD FOR PLAYER #{ current_player.id }"
-        Action.record_fold(current_player, "fold_by_timeout_bot")
-        current_player.round.next_action
+        if current_player.replacement
+          current_player.replace_cards("0", "noop__by_timeout_bot")
+          current_player.round.next_replacement
+        else
+          Action.record_fold(current_player, "fold_by_timeout_bot")
+          current_player.round.next_action
+        end
       else
         # puts "    no folds"
       end

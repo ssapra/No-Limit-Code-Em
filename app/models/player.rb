@@ -49,9 +49,10 @@ class Player < ActiveRecord::Base
     end
   end
   
-  def replace_cards(replace)      # ALL REPLACEMENT HAPPENS HERE
+  def replace_cards(replace, comment = nil)      # ALL REPLACEMENT HAPPENS HERE
     if replace.to_i == 0
-      PlayerActionLog.create(:hand_id => round.id, :player_id => self.id, :action => "replace", :comment => "nothing")
+      comment ||= "nothing"
+      PlayerActionLog.create(:hand_id => round.id, :player_id => self.id, :action => "replace", :comment => comment)
       reset_after_replacement
     else
       if acceptable_replacement?(replace)
