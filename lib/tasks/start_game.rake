@@ -1,9 +1,9 @@
 desc "Starts the poker game"
 task :start_game => :environment do
   start_game_thread = Thread.new do
-    # logger.info "\nStarting timeout bot."
+    # logger.info "\nStarting start game bot."
     start_game!
-    # logger.info "\nTimeout bot spinning down."
+    # logger.info "\nStart Game bot spinning down."
   end
   start_game_thread.join
 end
@@ -26,17 +26,17 @@ def start_game!
 end
 
 def setup_tables
-  logger.debug "REACHED TABLES"
+  # logger.debug "REACHED TABLES"
   Table.destroy_all
   player_ids = Player.all.map do |player| 
     player.reload
     if player.in_game then player.id end
   end
-  logger.debug "ids: #{player_ids}"    
+  # logger.debug "ids: #{player_ids}"    
   player_ids-=[nil]
-  logger.debug "ids: #{player_ids}"
+  # logger.debug "ids: #{player_ids}"
   table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE)
-  logger.debug "#{table_list}"
+  # logger.debug "#{table_list}"
   table_list.each do |player_ids|
     table = Table.create_with_new_deck
     player_ids.each do |id|
