@@ -29,22 +29,10 @@ class StatusController < ApplicationController
            format.html { redirect_to display_path }
          end
       else 
-         PlayerActionLog.destroy_all
-         HandLog.destroy_all
-         PlayerStateLog.destroy_all
-         Status.first.update_attributes(:waiting => false)
-         if Player.all.count > 1
-           setup_tables
-           Table.all.each do |table|
-             table.begin_play
-           end
-           status.game = true
-           status.save!
-           call_rake :timeout_bot
-         end
-         respond_to do |format|
-           format.html { redirect_to display_path }
-         end
+        call_rake :start_game
+        respond_to do |format|
+         format.html { redirect_to display_path }
+        end
       end
     end
   end
