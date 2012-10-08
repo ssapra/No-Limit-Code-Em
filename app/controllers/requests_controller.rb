@@ -94,9 +94,8 @@ class RequestsController < ApplicationController
     player = Player.find_by_name(params[:name])
 
     if player && verify_player?(player, params[:player_key]) && verify_player_turn?(player) 
-      # current_hand_log = HandLog.find_all_by_table_id(player.table.id).last
-      #      hand_id = current_hand_log.hand_id
-      last_play = PlayerActionLog.find_all_by_hand_id(player.round.id).last
+      last_plays = PlayerActionLog.find_all_by_hand_id(player.round.id)
+      last_play = last_plays.select { |play| play.comment != "Invalid Action" && play.player_id != player.id }.last
       last_play_time = last_play.created_at
       if Time.now - last_play_time > 5
         Action.record_raw_action(player, params[:player_action], params[:parameters])

@@ -17,7 +17,7 @@ def run_timeout_bot!
       next unless current_hand_log = HandLog.find_all_by_table_id(active_table.id).last
       # puts "    Hand Log: #{ current_hand_log.inspect }"
       hand_id = current_hand_log.hand_id
-      next unless last_play = PlayerActionLog.find_all_by_hand_id(hand_id).last
+      next unless last_play = PlayerActionLog.find_all_by_hand_id(hand_id).select { |play| play.comment != "Invalid Action" }.last
       # puts "    Last Play: #{ last_play.inspect }"
       last_play_time = last_play.created_at
       if Time.now - last_play_time > 6 # covers race condition
