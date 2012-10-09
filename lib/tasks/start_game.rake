@@ -22,7 +22,7 @@ def start_game!
    end
    status.game = true
    status.save!
-   Rake::Task["timeout_bot"].invoke
+   # Rake::Task["timeout_bot"].invoke
   end
 end
 
