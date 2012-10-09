@@ -4,7 +4,7 @@ class Action < ActiveRecord::Base
     if player.round.minimum_bet == player.bet
       Action.save_player_action(player, "check", 0)
     else
-      Action.record_raw_action(player, action, parameter)
+      Action.record_raw_action(player, action, parameter, "minimum bet does not equal player bet")
       Action.record_fold(player)
     end
   end
@@ -19,11 +19,11 @@ class Action < ActiveRecord::Base
     elsif min_bet == player.bet && bet <= player.stack && bet <= minimum_stack
       Action.save_player_action(player, "bet", bet)
     elsif min_bet == player.bet && bet <= player.stack && bet > minimum_stack
-      Action.record_raw_action(player, action, parameter)
+      Action.record_raw_action(player, action, parameter, "bet over minimum stack - adjusting automatically")
       bet = minimum_stack
       Action.save_player_action(player, "bet", bet)
-    else          
-      Action.record_raw_action(player, action, parameter)
+    else
+      Action.record_raw_action(player, action, parameter, "invalid bet amount")
       Action.record_fold(player)
     end
   end
@@ -34,7 +34,7 @@ class Action < ActiveRecord::Base
     if bet <= player.stack  
       Action.save_player_action(player, "call", bet)
     else
-      Action.record_raw_action(player, action, parameter)
+      Action.record_raw_action(player, action, parameter, "call bet greater than player stack")
       Action.record_fold(player)
     end
   end
@@ -52,12 +52,12 @@ class Action < ActiveRecord::Base
       #Action.save_player_action(player, "raise", total_bet)
     elsif min_bet != player.bet && total_bet <= player.stack && raise_amount > 0 && raise_amount > minimum_stack
       smallest_raise = player.smallest_stack
-      Action.record_raw_action(action, parameter)
+      Action.record_raw_action(player, action, parameter, "raise over  player smallest stack - adjusting automatically")
       Action.save_player_action(player, "call", call_amount)
       Action.save_player_action(player, "raise", smallest_raise)
       #Action.save_player_action(player, "raise", smallest_raise + call_amount)
     else
-      Action.record_raw_action(player, action, parameter)
+      Action.record_raw_action(player, action, parameter, "invalid raise")
       Action.record_fold(player)
     end
   end
@@ -80,8 +80,13 @@ class Action < ActiveRecord::Base
     PlayerActionLog.create(:hand_id => player.round.id, :betting_round_id => player.bettingid_check, :player_id => player.id, :action => action, :amount => parameter, :comment => comment)
   end
   
-  def self.record_raw_action(player, raw_action, raw_parameter)
-    PlayerActionLog.create(:hand_id => player.round.id, :betting_round_id => player.bettingid_check, :player_id => player.id, :action => raw_action, :amount => raw_parameter, :comment => "Invalid Action")
+  def self.record_raw_action(player, raw_action, raw_parameter, comment = nil)
+    PlayerActionLog.create(:hand_id => player.round.id,
+                           :betting_round_id => player.bettingid_check,
+                           :player_id => player.id,
+                           :action => raw_action,
+                           :amount => raw_parameter,
+                           :comment => "Invalid Action" + (comment ? " - #{ comment }" : ""))
   end
   
   def self.record_fold(player, comment = nil)

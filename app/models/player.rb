@@ -44,7 +44,7 @@ class Player < ActiveRecord::Base
       when "fold"
         Action.record_fold(self)
       else
-        Action.record_raw_action(self, action, parameter)
+        Action.record_raw_action(self, action, parameter, "could not resolve action")
         Action.record_fold(self)
     end
   end
