@@ -9,7 +9,7 @@ task :timeout_bot => :environment do
 end
 
 def run_timeout_bot!
-  sleep 6
+  sleep 1
   while Status.first.game do
     Table.all.each do |active_table|
       next unless active_table.turn_id
@@ -35,7 +35,7 @@ def run_timeout_bot!
       end
     end
     puts "#{ Time.now } Timing out users"
-    sleep 6
+    sleep 1
   end
   puts "*** NO MORE TABLES, ENDING"
 end
