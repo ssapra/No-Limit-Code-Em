@@ -92,7 +92,7 @@ class Round < ActiveRecord::Base
                                :player_id => player.id,
                                :action => "lost",
                                :comment => "could not match ante")
-      end                         
+      end
     end
   end
   
@@ -122,7 +122,7 @@ class Round < ActiveRecord::Base
   
   def next_action
     self.reload
-    if self.players_in.count == 1                             
+    if self.players_in.count == 1
       logger.debug "ONLY 1 PLAYER LEFT"
       self.determine_winner
       self.table.reset_players
