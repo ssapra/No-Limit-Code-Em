@@ -27,7 +27,7 @@ def run_timeout_bot!
           current_player.replace_cards("0", "noop__by_timeout_bot")
           current_player.round.next_replacement
         else
-          Action.record_fold(current_player, "fold_by_timeout_bot")
+          Action.record_fold(current_player, "fold_by_timeout_bot #{ last_play_time } #{ Time.now - last_play_time }")
           current_player.round.next_action
         end
       else
