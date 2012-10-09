@@ -43,10 +43,19 @@ class Table < ActiveRecord::Base
   def deal_cards 
     round.pot.reload
     live_players = order_players
+    live_players.each do |player|
+      player.reload
+      player.bet = 0
+      player.action = nil
+      player.hand = []
+      player.in_round = true        # Otherwise, back in the game baby...
+      player.replacement = false
+      player.save
+    end
     5.times do 
-        live_players.each do |player| 
-          player.hand << self.deal
-          player.save!
+      live_players.each do |player| 
+        player.hand << self.deal
+        player.save!
       end
     end
     log_dealt_cards(live_players)
