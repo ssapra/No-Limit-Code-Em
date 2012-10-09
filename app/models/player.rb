@@ -44,14 +44,15 @@ class Player < ActiveRecord::Base
       when "fold"
         Action.record_fold(self)
       else
-        Action.record_raw_action(self, action, parameter)
+        Action.record_raw_action(self, action, parameter, "could not resolve action")
         Action.record_fold(self)
     end
   end
   
-  def replace_cards(replace)      # ALL REPLACEMENT HAPPENS HERE
+  def replace_cards(replace, comment = nil)      # ALL REPLACEMENT HAPPENS HERE
     if replace.to_i == 0
-      PlayerActionLog.create(:hand_id => round.id, :player_id => self.id, :action => "replace", :comment => "nothing")
+      comment ||= "nothing"
+      PlayerActionLog.create(:hand_id => round.id, :player_id => self.id, :action => "replace", :comment => comment)
       reset_after_replacement
     else
       if acceptable_replacement?(replace)

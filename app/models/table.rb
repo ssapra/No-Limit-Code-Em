@@ -18,6 +18,10 @@ class Table < ActiveRecord::Base
   has_many :players, :through => :seats
   has_many :rounds, :dependent => :destroy
   
+  def self.create_with_new_deck
+    Table.create(:deck => Deck.new, :waiting => false)
+  end
+
   def round
     if self.rounds
       self.rounds.last
@@ -39,10 +43,19 @@ class Table < ActiveRecord::Base
   def deal_cards 
     round.pot.reload
     live_players = order_players
+    live_players.each do |player|
+      player.reload
+      player.bet = 0
+      player.action = nil
+      player.hand = []
+      player.in_round = true        # Otherwise, back in the game baby...
+      player.replacement = false
+      player.save
+    end
     5.times do 
-        live_players.each do |player| 
-          player.hand << self.deal
-          player.save!
+      live_players.each do |player| 
+        player.hand << self.deal
+        player.save!
       end
     end
     log_dealt_cards(live_players)
@@ -116,6 +129,7 @@ class Table < ActiveRecord::Base
         count_of_players+=1
       end
     end
+    ante_change
     logger.debug "Players in game: #{count_of_players}"
     status = Status.first
     status.reload
@@ -148,6 +162,10 @@ class Table < ActiveRecord::Base
         logger.debug "DEALING CARDS FOR NEXT ROUND"
         self.begin_play
       end
+  end
+  
+  def ante_change      
+    ServerApp::Application.config.ANTE = (HandLog.count / 20.0).ceil * 20
   end
   
   def shuffle_to_one_table?
