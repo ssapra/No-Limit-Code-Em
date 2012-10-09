@@ -3,6 +3,7 @@ module PlayersHelper
   def verify_player_turn?(player)
       begin 
          table = player.table
+         table.reload
          if table.turn_id == player.id
            return true
          end

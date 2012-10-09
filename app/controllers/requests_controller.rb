@@ -94,11 +94,12 @@ class RequestsController < ApplicationController
     player = Player.find_by_name(params[:name])
 
     if player && verify_player?(player, params[:player_key]) && verify_player_turn?(player) 
+      player.round.reload
       last_plays = PlayerActionLog.find_all_by_hand_id(player.round.id)
       last_play = last_plays.select { |play| !((play.comment || "").start_with?("Invalid Action")) && play.action != "win" && play.player_id != player.id }.last
       last_play_time = last_play.created_at
       if Time.now - last_play_time > 5
-        Action.record_raw_action(player, params[:player_action], params[:parameters], "Submitted after 5 second window")
+        Action.record_raw_action(player, params[:player_action], params[:parameters], "Submitted after 5 second window #{ last_play.id } #{ Time.now - last_play_time }")
       elsif 
         if player.replacement == false
           logger.debug "RECEIVED PLAYER ACTION"
