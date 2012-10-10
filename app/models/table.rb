@@ -164,18 +164,8 @@ class Table < ActiveRecord::Base
       end
   end
   
-  def ante_change
-    
-    total_players = Player.count
-    players_still_in = 0
-    Player.all.each do |player|
-      player.reload
-      if player.in_game then players_still_in +=1 end
-    end
-    
-    fraction_out = total_players / players_still_in.to_f 
-    
-    ServerApp::Application.config.ANTE = (HandLog.count / fraction_out).ceil * 20
+  def ante_change      
+    ServerApp::Application.config.ANTE = (HandLog.count / 20.0).ceil * 20
   end
   
   def shuffle_to_one_table?
