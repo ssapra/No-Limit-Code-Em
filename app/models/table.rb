@@ -157,7 +157,7 @@ class Table < ActiveRecord::Base
         Player.find_by_in_game(true).update_attributes(:losing_time => Time.now)
         #self.find_winners
         Table.first.update_attributes(:game_over => true)
-        # Status.first.update_attributes(:game => false)
+        Status.first.update_attributes(:game => false)
       else
         logger.debug "DEALING CARDS FOR NEXT ROUND"
         self.begin_play

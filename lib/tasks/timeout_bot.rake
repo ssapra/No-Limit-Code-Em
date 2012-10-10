@@ -1,15 +1,9 @@
 desc "Runs timeout bot"
 task :timeout_bot => :environment do
-  #timeout_bot_thread = Thread.new do
-    # logger.info "\nStarting timeout bot."
-    run_timeout_bot!
-    # logger.info "\nTimeout bot spinning down."
-  #end
-  #timeout_bot_thread.join
+  run_timeout_bot!
 end
 
 def run_timeout_bot!
-  sleep 1
   start_time = Time.now
   while Status.first.game do
     Table.all.each do |active_table|
@@ -42,7 +36,6 @@ def run_timeout_bot!
       end
     end
     puts "#{ Time.now } Timing out users"
-    sleep 1
   end
   puts "*** NO MORE TABLES, ENDING"
 end
