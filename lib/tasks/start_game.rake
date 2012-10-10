@@ -14,6 +14,8 @@ def start_game!
   HandLog.destroy_all
   PlayerStateLog.destroy_all
   status = Status.first
+  status.registration = false
+  status.save!
   status.update_attributes(:waiting => false)
   if Player.all.count > 1
    setup_tables
