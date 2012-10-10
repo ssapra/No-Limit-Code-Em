@@ -14,7 +14,7 @@ ServerApp::Application.routes.draw do
   
   ####### Sandbox Routes
   
-  post "/sandbox/betting_round" => 'sandbox#action'
+  post "/sandbox/player_action" => 'sandbox#action'
   
   get "/sandbox/current_turn" => 'sandbox#current_turn'
   get "/sandbox/game_over" => 'sandbox#game_over'

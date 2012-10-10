@@ -29,24 +29,26 @@ class SandboxController < ApplicationController
   
   
   def current_turn
-    body = {:current_player => "#{params[:name]}", 
+    
+    body = {:current_player => "Joe", 
             :replacement => false,
             :hand => ["5c", "8d", "3d", "As", "Kh"], 
             :bet => 100, 
+            :stack => 400, 
+            :pot => 300
             :min_bet => 150,
             :max_bet => 300,
             :max_raise => 200,
-            :stack => 400, 
-            :pot => 300, 
-            :table_id => 2}
+          }
              
     body[:betting_summary] = ["John bets 200",
                             "Sally calls 200"]
     body[:replacement_summary] = ["John replaced 2 cards",
                                   "Sally replaced 0 cards"]       
-    body[:round_summary] = "John won the last game"
+    body[:round_summary] = ['John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16']
     body[:play] = true
     body[:waiting] = false
+    body[:game_over] = false
     logger.debug "body: #{body}"
     
     respond_to do |format|
@@ -65,8 +67,8 @@ class SandboxController < ApplicationController
                "2. Player C",
                "3. Player B"]
                
-    previous_winner = ["John won the last game",
-                       "Sally won this game"]
+    previous_winner = ['John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16',
+                       'Sally won 1200 chips with ["4c", "8c", "2c", "9c", "Tc"] for Hand#17']
     
     body = {:message => "Tournament is Over", 
             :winning_summary => summary, 
