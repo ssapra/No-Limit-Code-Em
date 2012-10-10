@@ -1,4 +1,4 @@
-require '/Users/nshah/Documents/Projects/No-Limit-Code-Em/spec/spec_helper.rb'
+require 'spec_helper'
 
 describe 'Split Pot' do
 
@@ -18,9 +18,9 @@ end
 def setup_player(no_of_players = 2)
   players = []
   no_of_players.times do |a|
-    Player.find_by_name("#{a}0001") && Player.find_by_name("#{a}0001").destroy
-    Player.find_by_game_id("#{a}0001") && Player.find_by_game_id("#{a}0001").destroy
-    p = Player.new(:name => "#{a}0001", :game_id => "#{a}0001")
+    Player.find_by_name("1#{a}00001") && Player.find_by_name("1#{a}00001").destroy
+    Player.find_by_game_id("1#{a}00001") && Player.find_by_game_id("1#{a}00001").destroy
+    p = Player.new(:name => "1#{a}00001", :game_id => "1#{a}00001")
     p.save
     players << p
   end
@@ -33,7 +33,7 @@ def setup_tables_for_test(player_ids)
   tables = []
   table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE) 
   table_list.each do |player_ids|
-    table = table.create_with_new_deck
+    table = Table.create_with_new_deck
     tables << table
     player_ids.each do |id|
       seat = Seat.create(:table_id => table.id, :player_id => id)
