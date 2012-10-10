@@ -4,7 +4,7 @@ task :timeout_bot => :environment do
     # logger.info "\nStarting timeout bot."
     run_timeout_bot!
     # logger.info "\nTimeout bot spinning down."
-  end
+  #end
   #timeout_bot_thread.join
 end
 
