@@ -157,7 +157,7 @@ class Table < ActiveRecord::Base
         Player.find_by_in_game(true).update_attributes(:losing_time => Time.now)
         #self.find_winners
         Table.first.update_attributes(:game_over => true)
-        # Status.first.update_attributes(:game => false)
+        Status.first.update_attributes(:game => false)
       else
         logger.debug "DEALING CARDS FOR NEXT ROUND"
         self.begin_play
@@ -165,7 +165,7 @@ class Table < ActiveRecord::Base
   end
   
   def ante_change      
-    ServerApp::Application.config.ANTE = (HandLog.count / 20.0).ceil * 20
+    ServerApp::Application.config.ANTE = (HandLog.count / 10.0).ceil * 20
   end
   
   def shuffle_to_one_table?
@@ -258,8 +258,10 @@ class Table < ActiveRecord::Base
   end
 
   def last_winner
-    last_win_hand = PlayerActionLog.where("action = 'win'").select { |x| x.table.id == self.id }.last.hand_id
-    last_win_logs = PlayerActionLog.where("action = 'win' and hand_id = ?", last_win_hand)
+    last_win_hand = PlayerActionLog.where("action = 'win'").select { |x| x.table.id == self.id }.last
+    return "No Winners Yet" unless last_win_hand
+    last_win_logs = PlayerActionLog.where("action = 'win' and hand_id = ?", last_win_hand.hand_id)
+    return "No Winners Yet" unless last_win_logs
     output = ""
     last_win_logs.each do |log|
       output += "#{ Player.find(log.player_id).name } wins #{ log.amount } chips#{ log.comment }\n"

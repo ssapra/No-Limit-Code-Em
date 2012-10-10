@@ -232,12 +232,12 @@ class Round < ActiveRecord::Base
         division = winners.count
         logger.debug  "The pot is split #{division}-way."
         winners.each do |winner|  # NEED TO REMEMBER TO KEEP EXTRA CHIPS IN POT FOR NEXT ROUND
-          winner.stack += self.pot.total/division 
+          winner.stack += pot.total/division 
           winner.save
           PlayerActionLog.create(:hand_id => self.id,
                                :player_id => winner.id,
                                :action => "win",
-                               :amount => self.pot.total/division,
+                               :amount => pot.total/division,
                                :comment => " with #{winner.hand}")         
         end
       end
