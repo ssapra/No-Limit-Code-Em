@@ -105,39 +105,216 @@ Ah, Ks, Qd, Jc, 9s
 
 1. Only 1 student can register per team. Teams must have 2 people.
 2. Once registration is declared to be open, you must register at http://enovapoker.herokuapp.com/registration with your name and game_id.
-   
     1. The name can be any creative username or actual name.
-    2.	Your game_id MUST be an actual id number that you have on your person. This game_id will prove that the winner is you should you place in the top 3.
-    3.	Your player key is returned to you upon being registered. This player key must be saved and kept hidden from other teams.
+    2. Your game_id MUST be an actual id number that you have on your person. This game_id will prove that the winner is you should you place in the top 3.
+    3. Your player key is returned to you upon being registered. This player key must be saved and kept hidden from other teams.
 3. In order to properly send your requests, you must include the player key in your requests. We will give everyone about 15 minutes to make sure they can start making get requests before the tournament is started.
 4. You have 5 seconds to respond back to the server with your action once the server has declared it is your turn. If you do not respond, the server will set your action as a fold and you will wait until the next round to begin play.
 5. You must make the correct move otherwise you will be forced to fold your hand. 
-   
     1. Ex. If you bet 200 when you only have 150 chips, you will fold.
-    2.	Ex. If you call when the minimum bet and your bet are the same, that is the wrong response because a check is expected.
-    3.	Exception: If you bet 200 when you have 300 chips but the smallest stack is 150, you will be cut down to bet 150 and allowed to stay in the game.	
+    2. Ex. If you call when the minimum bet and your bet are the same, that is the wrong response because a check is expected.
+    3. Exception: If you bet 200 when you have 300 chips but the smallest stack is 150, you will be cut down to bet 150 and allowed to stay in the game.  
 
 
-===Requests
+==Requests
 
 There will be 2 requests that you need to make to the server.
 
-====1.	GET request
+=== GET /game_state (Receiving Game State)
 
-In order to get the current state of the table you are sitting at, you have to make a GET request. 
+==== Syntax
 
-The url that you have to point your program towards is http://enovapoker.herokuapp.com/game_state. The parameters that you must include are name, game_id, and player_key. Without these three parameters, you will not be able to receive a state of the game to determine if you must respond with your move.
+===== Request
 
-====2.	POST request
+  json
+  {
+    "name" : "Joe",
+    "game_id" : 43123123,
+    "player_key" : 031siodfj23290u32
+  }  
 
-In order to make your move, you must make a POST request to http://enovapoker.herokuapp.com/player. The parameters that are expected are 
+===== Response
+  
+  json
+  {
+    "current_player" : "Sally",
+    "replacement" : false,
+    "hand" : ["Ac", "3d", "8c", "Ts", "Ah"],
+    "bet" : 40,
+    "stack" : 400,
+    "pot" : 140,
+    "min_bet" : 50,
+    "max_bet" : 360,
+    "max_raise" : 160,
+    "betting_summary" : [
+      "Sally bets 50",
+      "John calls 50"
+    ],   
+    "replacement_summary" : [
+      "Sally replaces 3 cards",
+      "John replaces 2 cards"
+    ],
+    "round_summary" : [
+      "Sally won 300 chips with ["2c", "2d", "2h", "3h", "3c"] for Hand#14",
+      "John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16
+    ],
+    "play" : true,
+    "waiting" :false,
+    "game_over" : false
+    "winning_summary" : [
+      "1. Sally",
+      "2. John",
+      "3. Joe"
+    ],
+    "message" : "Game is about to Start"
+  } 
 
-1.  Name (ex. John)
-2.	game_id (ex. 12342314)
-3.	player_key (ex. 23fejf2980jf203jdwij)
-4.	player_action (ex. "bet", "replace", "call")
-5.	parameters (ex. "45", "20", "345")
-  * When you are determining which cards to replace, set parameters to be "123" to replace your first, second, and third card.
+==== Further Explanation on Response
+
+  "play" : true signals that it is your turn;
+  "replacement" : true signals that you should be making a post request to replace your cards
+  "bet" and "min_bet" : if these two are different, your actions are limited to call, raise, or fold
+                        if these two are the same value, your actions are limited to check, bet, or fold
+  "game_over" : true signals that the tournament is over and that the final summary is available
+  "waiting" : true signals that your table is waiting for all other tables to be ready to reshuffle the seats
+
+
+=== POST /player (Making a move)
+
+==== Syntax
+
+===== Request
+
+  json
+  {
+    "name" : "John",
+    "game_id" : 1203098123,
+    "player_key" : "108jj0329fj30982ds",
+    "player_action" : "bet",
+    "parameters" : "45"
+  } 
+
+<b>Note:</b> When you are determining which cards to replace, set parameters to be "123" to replace your first, second, and third card.
+
+===== Response
+
+No response given.
+
+== Development and Testing
+
+=== Sandbox
+
+In order to make sure that you are sending the correct information and receivng the correct information, there are several requests you can make.
+
+=== GET /sandbox/current_turn (Getting game state)
+
+==== Syntax
+
+===== Request
+
+  json
+  {
+    "name" : "Joe",
+    "game_id" : 43123123,
+    "player_key" : 031siodfj23290u32
+  }  
+
+===== Response
+  
+ json
+  {
+    "current_player" : "Joe",
+    "replacement" : false,
+    "hand" : ["5c", "8d", "3d", "As", "Kh"], 
+    "bet" : 100,
+    "stack" : 400,
+    "pot" : 140,
+    "min_bet" : 50,
+    "max_bet" : 360,
+    "max_raise" : 160,
+    "betting_summary" : [
+      "Sally bets 50",
+      "John calls 50"
+    ],   
+    "replacement_summary" : [
+      "Sally replaces 3 cards",
+      "John replaces 2 cards"
+    ],
+    "round_summary" : [
+      "John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16
+    ],
+    "play" : true,
+    "waiting" :false,
+    "game_over" : false,
+    "message" : "Game is about to Start"
+  } 
+
+
+=== GET /sandbox/game_over (Getting game state when tournament is over)
+
+==== Syntax
+
+===== Request
+
+  json
+  {
+    "name" : "Joe",
+    "game_id" : 43123123,
+    "player_key" : 031siodfj23290u32
+  }  
+
+===== Response
+  
+ json
+  {
+    "message" : "Tournament is Over",
+    "winning_summary" : [
+      "Tournament is Over.",
+      " ", 
+      "Player Standings", 
+      "----------------",
+      "1. Player A",
+      "2. Player C",
+      "3. Player B"
+     ],
+    "round_summary" : [
+       'John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16',
+       'Sally won 1200 chips with ["4c", "8c", "2c", "9c", "Tc"] for Hand#17'
+    ],
+    "game_over" : true
+  }
+
+
+=== POST /sandbox/player_action (Posting action)
+
+==== Syntax
+
+===== Request
+
+  json
+  {
+    "name" : "Joe",
+    "game_id" : 43123123,
+    "player_key" : 031siodfj23290u32,
+    "player_action" : "replce",
+    "parameters" : "125"
+  }  
+
+===== Response
+  
+  json
+  {
+    [
+      "---Received---",
+      "Name: Joe",
+      "ID: 43123123",
+      "Player key: 031siodfj23290u32",
+      "Action: replce",
+      "Parameters: 125",
+      " ",
+      "Invalid Action: replce"
+    ]
+  } 
 
  
 ==Prizes
