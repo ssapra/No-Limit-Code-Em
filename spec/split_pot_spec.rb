@@ -18,9 +18,9 @@ end
 def setup_player(no_of_players = 2)
   players = []
   no_of_players.times do |a|
-    player.find_by_name("#{a}0001") && player.find_by_name("#{a}0001").destroy
-    player.find_by_game_id("#{a}0001") && player.find_by_game_id("#{a}0001").destroy
-    p = player.new(:name => "#{a}0001", :game_id => "#{a}0001")
+    Player.find_by_name("#{a}0001") && Player.find_by_name("#{a}0001").destroy
+    Player.find_by_game_id("#{a}0001") && Player.find_by_game_id("#{a}0001").destroy
+    p = Player.new(:name => "#{a}0001", :game_id => "#{a}0001")
     p.save
     players << p
   end
@@ -28,25 +28,25 @@ def setup_player(no_of_players = 2)
 end
 
 def setup_tables_for_test(player_ids)
-  table.destroy_all
+  Table.destroy_all
   player_ids-=[nil]
   tables = []
-  table_list = tablemanager.assign(player_ids, serverapp::application.config.max_table_size)
+  table_list = TableManager.assign(player_ids, ServerApp::Application.config.MAX_TABLE_SIZE) 
   table_list.each do |player_ids|
     table = table.create_with_new_deck
     tables << table
     player_ids.each do |id|
-      seat = seat.create(:table_id => table.id, :player_id => id)
-      player.find_by_id(id).update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
+      seat = Seat.create(:table_id => table.id, :player_id => id)
+      Player.find_by_id(id).update_attributes(:seat_id => seat.id, :hand => [], :replacement => false)
     end
   end
   tables
 end
 
 def setup_hands(player_ids)
-  players = player.find :all, :conditions => ["id in (?)", player_ids]
+  players = Player.find :all, :conditions => ["id in (?)", player_ids]
   players.each do |p|
-    p.hand = ["as 2s 3s 4s 5s"]
+    p.hand = ["As 2s 3s 4s 5s"]
     p.save
   end
 end
