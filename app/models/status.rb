@@ -2,12 +2,8 @@ require 'json'
 
 class Status < ActiveRecord::Base
   attr_accessible :game, 
-                  # :play, 
                   :registration,
                   :waiting
-                  # :tournament
-  
-  
   
   def self.current_state
     leaderboard = get_leaderboard
