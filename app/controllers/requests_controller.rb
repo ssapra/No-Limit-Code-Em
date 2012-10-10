@@ -97,18 +97,22 @@ class RequestsController < ApplicationController
       player.round.reload
       last_plays = PlayerActionLog.find_all_by_hand_id(player.round.id)
       last_play = last_plays.select { |play| !((play.comment || "").start_with?("Invalid Action")) && play.action != "win" && play.player_id != player.id }.last
-      last_play_time = last_play.created_at
-      if Time.now - last_play_time > 5
-        Action.record_raw_action(player, params[:player_action], params[:parameters], "Submitted after 5 second window #{ last_play.id } #{ Time.now - last_play_time }")
-      elsif 
-        if player.replacement == false
-          logger.debug "RECEIVED PLAYER ACTION"
-          player.resolve_action(params[:player_action], params[:parameters])
-          player.round.next_action
-        elsif player.replacement && params[:player_action] == "replacement" 
-          logger.debug "REPLACEMENT RECEIVED"
-          player.replace_cards(params[:parameters]) 
-          player.round.next_replacement
+      if last_play.nil?
+        Action.record_raw_action(player, params[:player_action], params[:parameters], "No ante or deal has occurred, action ignored")
+      else
+        last_play_time = last_play.created_at
+        if Time.now - last_play_time > 5
+          Action.record_raw_action(player, params[:player_action], params[:parameters], "Submitted after 5 second window #{ last_play.id } #{ Time.now - last_play_time }")
+        elsif 
+          if player.replacement == false
+            logger.debug "RECEIVED PLAYER ACTION"
+            player.resolve_action(params[:player_action], params[:parameters])
+            player.round.next_action
+          elsif player.replacement && params[:player_action] == "replacement" 
+            logger.debug "REPLACEMENT RECEIVED"
+            player.replace_cards(params[:parameters]) 
+            player.round.next_replacement
+          end
         end
       end
     end
