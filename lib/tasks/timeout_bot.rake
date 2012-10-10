@@ -11,11 +11,11 @@ def run_timeout_bot!
         active_table.reload
         next unless active_table.turn_id
         puts "  Table #{ active_table.id }"
-        next unless current_hand_log = HandLog.find_all_by_table_id(active_table.id).last
+        next unless current_hand_log = HandLog.find(:last, :conditions => ["table_id = ?", active_table.id])
         puts "    Hand Log: #{ current_hand_log.inspect }"
         hand_id = current_hand_log.hand_id
         active_table.reload # stupid, but at this point, i just want to cry
-        next unless last_play = PlayerActionLog.find_all_by_hand_id(hand_id).select { |play| !((play.comment || "").start_with?("Invalid Action")) }.last
+        next unless last_play = PlayerActionLog.find(:last, :conditions => ["hand_id = ? and (comment is null or comment not like ?)", hand_id, "Invalid Action%"])
         puts "    Last Play: #{ last_play.inspect }"
         last_play_time = last_play.created_at
         if Time.now - last_play_time > 6 # covers race condition
