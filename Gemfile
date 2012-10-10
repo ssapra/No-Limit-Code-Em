@@ -15,7 +15,6 @@ group :production do
 	gem 'pg'
 end
 
-gem 'devise'
 gem 'ruby-poker'
 gem 'bootstrap-sass'
 gem 'google-buttons-sass'
