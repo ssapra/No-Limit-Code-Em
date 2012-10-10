@@ -43,7 +43,7 @@ class Status < ActiveRecord::Base
     tables = {}
     Table.all.each do |table|
       tables[table.id] = { :last_winner => table.last_winner,
-                           :players => table.players.collect(&:name) }
+                           :players => table.players }
     end
     tables
   end

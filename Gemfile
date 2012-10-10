@@ -18,6 +18,7 @@ end
 gem 'devise'
 gem 'ruby-poker'
 gem 'bootstrap-sass'
+gem 'google-buttons-sass'
 
 group :test do
   gem 'cucumber-rails', '~> 1.3.0', :require => false

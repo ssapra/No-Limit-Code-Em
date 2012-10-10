@@ -21,4 +21,17 @@
 .span8
   %section#content
     %h2 Tables
-    = @tables
+    #poker_tables
+      - @tables.each do |id, data|
+        %table.poker_table.table.table-striped.table-bordered
+          %thead
+            %tr
+              %th Name
+              %th Chips
+          %tbody
+            - data[:players].each do |player|
+              %tr{:class => ("out" if player.in_round)}
+                %td= player.name
+                %td= player.stack
+                %td= player.hand
+      .clearfix
