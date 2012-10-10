@@ -1,0 +1,11 @@
+= form_for(@player, :url => "/", :method => :post) do |f|
+  .field
+    = f.label :name
+    %br/
+    = f.text_field :name
+  .field
+    = f.label :ID
+    %br/
+    = f.text_field :game_id
+  .actions
+    = f.submit "Enter Tournament"

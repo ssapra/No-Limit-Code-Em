@@ -17,6 +17,7 @@ end
 
 gem 'devise'
 gem 'ruby-poker'
+gem 'bootstrap-sass'
 
 group :test do
   gem 'cucumber-rails', '~> 1.3.0', :require => false
@@ -33,6 +34,7 @@ end
 # in production environments by default.
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
+  gem 'haml'
   gem 'coffee-rails', '~> 3.2.1'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes

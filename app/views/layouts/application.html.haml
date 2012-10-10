@@ -1,0 +1,19 @@
+!!!
+%html
+  %head
+    %title No Limit Code 'Em
+    = javascript_include_tag  "application"
+    = javascript_include_tag "//use.typekit.net/pgq1wgn.js"
+    :javascript
+      try{Typekit.load();}catch(e){}
+    = stylesheet_link_tag "application", :media => "all"
+    = csrf_meta_tags
+  %body
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          %a.logo{:href => "/"} No Limit Code 'Em
+
+    .container
+      .row
+        = yield

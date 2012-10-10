@@ -1,0 +1,75 @@
+/*= require_self */
+
+@import "bootstrap";
+
+body {
+  font: 1em proxima-nova-1, proxima-nova-2, Helvetica, Arial, sans-serif;
+  background: image-url('background.gif');
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: none;
+  padding-top: 120px;
+  color: #666;
+}
+a { &:hover { text-decoration: none; } }
+
+.navbar-inner {
+  padding: 8px 0px;
+  background: #fff;
+}
+
+.logo {
+  background: image-url('logo.jpg') no-repeat 0% 50%;
+  height: 80px;
+  display: block;
+  opacity: 1;
+  line-height: 80px;
+  padding-left: 210px;
+  font-size: 1.6em;
+}
+
+#content, #sidebar {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  h2 { 
+    background: #fff;
+    background: -moz-linear-gradient(top, white 0%, #f4f4f4 100%);
+    background: -webkit-linear-gradient(top, white 0%, #f4f4f4 100%);
+    background: linear, to bottom, white 0%, #f4f4f4 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px 4px 0 0;
+    color: #444;
+    font-size: 1.25em;
+    font-weight: 400;
+    line-height: 1.4;
+    margin: 0;
+    padding: .6em 1em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+}
+
+#scoreboard {
+  font-size: 0.8em;
+  thead {
+    tr { 
+      th { border-left: 1px solid #ddd; }
+      th:first-child { width: 1%; border-left: none }
+    }
+  }
+  tbody {
+    tr { &.lost { opacity: 0.5 } }
+    td i.stack {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-top: 1px;
+      line-height: 14px;
+      vertical-align: text-top;
+      background: image-url('stack.png') no-repeat;
+      background-size: 14px;
+      opacity: 0.8;
+      margin-right: 2px;
+    }
+  }
+}

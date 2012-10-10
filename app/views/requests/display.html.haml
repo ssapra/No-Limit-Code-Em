@@ -1,0 +1,11 @@
+%fieldset
+  %legend
+    %h1 Live Updates
+  %h2 Players
+  - if @players
+    - @players.each do |player|
+      %ul
+        = player.name
+        has connected
+  - else
+    %h3 No Players
