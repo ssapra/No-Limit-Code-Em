@@ -81,7 +81,11 @@ class RequestsController < ApplicationController
         end
       end
     else
-      body = {:message => "Game hasn't started yet"}
+      if PlayerActionLog.find_by_comment("First") 
+        body = {:message => "Tournament is over."}
+      else
+        body = {:message => "Tournament is about to begin."}
+      end
     end
   
     respond_to do |format|
