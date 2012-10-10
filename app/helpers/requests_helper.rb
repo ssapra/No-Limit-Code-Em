@@ -31,14 +31,14 @@ module RequestsHelper
     logs = HandLog.find_all_by_table_id(table.id)
     if (logs.length > 1 && round.second_bet == false) || table.waiting || Table.all.count == 1
       if table.waiting || table.game_over
-        previous_round_id = logs[logs.length - 2].hand_id
-        round_id = logs.last.hand_id
+        if logs[logs.length - 2] then previous_round_id = logs[logs.length - 2].hand_id end
+        if logs.last then round_id = logs.last.hand_id end
       else
         if logs.length > 2 then previous_round_id = logs[logs.length - 3].hand_id end
-        round_id = logs[logs.length - 2].hand_id
+        if logs[logs.length - 2] then round_id = logs[logs.length - 2].hand_id end
       end
-      last_round = capture_round_summary_data(round_id) 
-      previous_round = capture_round_summary_data(previous_round_id)
+      if round_id then last_round = capture_round_summary_data(round_id) end
+      if previous_round_id then previous_round = capture_round_summary_data(previous_round_id) end
       if previous_round then return [previous_round, last_round] else return last_round end
     end
   end
