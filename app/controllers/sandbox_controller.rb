@@ -35,7 +35,7 @@ class SandboxController < ApplicationController
             :hand => ["5c", "8d", "3d", "As", "Kh"], 
             :bet => 100, 
             :stack => 400, 
-            :pot => 300
+            :pot => 300,
             :min_bet => 150,
             :max_bet => 300,
             :max_raise => 200,
