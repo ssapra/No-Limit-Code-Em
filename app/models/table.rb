@@ -165,7 +165,7 @@ class Table < ActiveRecord::Base
   end
   
   def ante_change      
-    ServerApp::Application.config.ANTE = (HandLog.count / 20.0).ceil * 20
+    ServerApp::Application.config.ANTE = (HandLog.count / 10.0).ceil * 20
   end
   
   def shuffle_to_one_table?
