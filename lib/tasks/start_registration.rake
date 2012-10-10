@@ -5,7 +5,7 @@ task :start_registration => :environment do
     start_registration!
     puts "\nFinished starting registration."
   end
-  stop_game_thread.join
+  start_registration_thread.join
 end
 
 def start_registration!
