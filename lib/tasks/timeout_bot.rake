@@ -11,7 +11,7 @@ end
 def run_timeout_bot!
   sleep 1
   start_time = Time.now
-  while Status.first.game && Time.now - @start_time < 58 do
+  while Status.first.game && Time.now - start_time < 58 do
     Table.all.each do |active_table|
       active_table.reload
       next unless active_table.turn_id
