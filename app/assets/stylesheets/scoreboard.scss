@@ -1,0 +1,24 @@
+#scoreboard {
+  font-size: 0.8em;
+  thead {
+    tr { 
+      th { border-left: 1px solid #ddd; }
+      th:first-child { border-left: none } 
+    }
+  }
+  tbody {
+    tr { 
+      &.lost { opacity: 0.5 }
+      &.player {
+        i.chip {
+          margin-left: -13px;
+        }
+
+      }
+      td.chips {
+        padding-left: 20px;
+      } 
+    }
+  }
+}
+ 

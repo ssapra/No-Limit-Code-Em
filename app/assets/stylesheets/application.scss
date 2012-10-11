@@ -3,6 +3,8 @@
 @import "bootstrap";
 @import "google-buttons";
 
+@import "scoreboard";
+@import "poker_tables";
 @import "registration";
 
 body {
@@ -12,6 +14,7 @@ body {
   -webkit-text-size-adjust: none;
   color: #666;
 }
+
 a { &:hover { text-decoration: none; } }
 
 .navbar {
@@ -21,17 +24,21 @@ a { &:hover { text-decoration: none; } }
   .navbar-inner {
     padding: 8px 0px;
     background: #fff;
-  }
-}
 
-.logo {
-  background: image-url('logo.jpg') no-repeat 0% 50%;
-  height: 80px;
-  display: block;
-  opacity: 1;
-  line-height: 80px;
-  padding-left: 210px;
-  font-size: 1.6em;
+    .logo {
+      background: image-url('logo.jpg') no-repeat 0% 50%;
+      height: 80px;
+      display: block;
+      opacity: 1;
+      line-height: 80px;
+      padding-left: 210px;
+      font-size: 1.6em;
+      float: left;
+    } 
+    .pull-right {
+      margin-top: 20px;
+    }
+  }
 }
 
 .loader {
@@ -61,106 +68,6 @@ a { &:hover { text-decoration: none; } }
     margin: 0;
     padding: .6em 1em;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  }
-}
-
-#poker_tables {
-  padding: 20px;
-
-  .poker_table {
-    float: left;
-    font-size: 0.8em;
-    width: 48%;
-    margin-right: 20px;
-    margin-bottom: 20px; 
-    background: image-url('pattern.png');
-    @include border-radius(8px);
-    -webkit-background-clip: padding-box;
-    @include box-shadow(#{0 0 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.5)});
-    @include transition(all 0.3s linear);
-
-    &:nth-child(even) { margin-right: 0 }
-    &.hover {
-      @include box-shadow(0px 3px 12px 2px rgba(0,0,0,0.5));
-      top: -2px;
-      position: relative;
-    }
-
-    .players {
-      margin: 10px 0px;
-      padding: 0;
-      li { 
-        list-style: none;
-        float: left;
-        width: 33%;
-        margin-bottom: 40px; 
-        span {
-          text-align: center;
-          padding: 0px 10px;
-          display: block;
-          &.name { font-weight: bold; color: #fff; }
-          &.stack { color: #fff; }
-        }
-
-        &.bottom { 
-          margin-bottom: 0px; 
-        }
-      }
-    }
-
-    h3 { 
-      margin: 0;
-      padding: 5px 10px;
-      line-height: 24px;
-      font-size: 1.4em;
-      color: #fff;
-      background: image-url('wood.png') rgba(0,0,0,0.5);
-      text-align: center;
-      text-shadow: 0px 1px 0px rgba(0,0,0,0.7);
-      @include border-radius(8px 8px 0px 0px);
-      border-bottom: 2px solid rgba(0,0,0,0.7);
-
-      &.last_winner { 
-        margin-top: 10px;
-        @include border-radius(0 0 8px 8px);
-        background: rgba(0,0,0,0.2);
-        border-bottom: none;
-        text-shadow: none;
-        line-height: 24px;
-        font-size: 1em;
-        text-align: left;
-
-        i {
-          @include opacity(0.3);
-          margin-right: 3px;
-        }
-      }
-    }
-
-  }
-}
-
-#scoreboard {
-  font-size: 0.8em;
-  thead {
-    tr { 
-      th { border-left: 1px solid #ddd; }
-      th:first-child { border-left: none } 
-    }
-  }
-  tbody {
-    tr { 
-      &.lost { opacity: 0.5 }
-      &.player {
-        i.chip {
-          margin-left: -13px;
-        }
-
-      }
-      td.chips {
-        padding-left: 20px;
-      } 
-    }
   }
 }
 

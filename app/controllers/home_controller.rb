@@ -9,5 +9,6 @@ class HomeController < ApplicationController
   def update
     @scoreboard = Status.get_leaderboard
     @tables = Status.get_players_at_tables
+    @registration = true if Status.first.registration
   end
 end
