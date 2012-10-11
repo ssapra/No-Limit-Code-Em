@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>No Limit Code 'Em | Docs</title>
+    <link href="/assets/application-ad5d3b2f6cddd1c5e15b9194c6e72055.css" media="all" rel="stylesheet" type="text/css" />
+    <meta content="authenticity_token" name="csrf-param" />
+    <meta content="cVlN8pDZ3+cIL/mQTA7PDZgd3b5Etu4nQYzQt+hs01g=" name="csrf-token" />
+  </head>
+
+  <body>
+
+    <div class='navbar'>
+      <div class='navbar-inner'>
+        <div class='container'>
+          <a class='logo' href='/'>No Limit Code 'Em</a>
+        </div>
+      </div>
+    </div>
+
+    <div class='container'>
+      <div class='row'>
+
+        <div class='span8'>
+
+          <section id='content'>
+            <h2>
+              Requests 
+              <div class='loader'></div>
+            </h2>
+
+            <div class='poker_tables_wrapper'>
+
+              <div id='poker_tables'>
+
+                <p>There are 2 types of request you will need to make to the server. GET and POST.</p>
+
+              </div>
+            </div>
+          </section>
+
+          </br>
+
+          <section id='content'>
+
+            <h2>
+              GET /game_state (Request the game's current state)
+              <div class='loader'></div>
+            </h2>
+
+            <div class='poker_tables_wrapper'>
+              <div id='poker_tables'>
+                <h4>Syntax</h4>
+
+                <h5>Request</h5>
+                
+                <pre>
+json
+{
+  "name" : "Joe",
+  "game_id" : 43123123,
+  "player_key" : 031siodfj23290u32
+}  
+                </pre>
+
+                <h5>Response</h5>
+                <pre>
+json
+{
+  "current_player" : "Sally",
+  "replacement" : false,
+  "hand" : ["Ac", "3d", "8c", "Ts", "Ah"],
+  "bet" : 40,
+  "stack" : 400,
+  "pot" : 140,
+  "min_bet" : 50,
+  "max_bet" : 360,
+  "max_raise" : 160,
+  "betting_summary" : [
+    "Sally bets 50",
+    "John calls 50"
+  ],   
+  "replacement_summary" : [
+    "Sally replaces 3 cards",
+    "John replaces 2 cards"
+  ],
+  "round_summary" : [
+    "Sally won 300 chips with ["2c", "2d", "2h", "3h", "3c"] for Hand#14",
+    "John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16
+  ],
+  "play" : true,
+  "waiting" :false,
+  "winning_summary" : [
+    "1. Sally",
+    "2. John",
+    "3. Joe"
+  ],
+  "message" : "Game is about to Start"
+} 
+                </pre>
+
+              </div>
+            </div>
+
+          </section>
+
+          </br>
+
+          <section id='content'>
+            <h2>
+              Explanation of Response 
+              <div class='loader'></div>
+            </h2>
+            <div class='poker_tables_wrapper'>
+              <div id='poker_tables'>
+                <div class='clearfix'></div>
+                <table class='table table-striped' id='scoreboard'>
+                  <thead>
+                    <tr>
+                      <th>Term</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tr>
+                    <td>"play"</td>
+                    <td>Signal that it is your turn</td>
+                  </tr>
+                  <tr>
+                    <td>"replacement"</td>
+                    <td>true signals that you should be making a post request to replace your cards</td>
+                  </tr>
+                  <tr>
+                    <td>"bet" and "min_bet"</td>
+                    <td>If these two are different, your actions are limited to "call", "raise", or "fold".  If these two are the same value, your actions are limited to "check", "bet", or "fold".
+</td>
+                  </tr>
+                  <tr>
+                    <td>"waiting"</td>
+                    <td>True signals that your table is waiting for all other tables to be ready to reshuffle the seats.</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          </br>
+
+          <section id='content'>
+
+            <h2>
+              POST /player (Making a move)
+              <div class='loader'></div>
+            </h2>
+
+            <div class='poker_tables_wrapper'>
+              <div id='poker_tables'>
+                <h4>Syntax</h4>
+
+                <h5>Request</h5>
+                
+                <pre>
+json
+{
+  "name" : "John",
+  "game_id" : 1203098123,
+  "player_key" : "108jj0329fj30982ds",
+  "player_action" : "bet",
+  "parameters" : "45"
+} 
+                </pre>
+                
+                <p>
+                  <b>Note:</b> When you are determining which cards to replace, set parameters to be "123" to replace your first, second, and third card.
+                </p>
+
+                <h5>Response</h5>
+                <p>No JSON response is returned from the server.</p>
+
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+    </div>
+
+  </body>
+</html>
+
