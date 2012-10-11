@@ -44,8 +44,9 @@ class SandboxController < ApplicationController
     body[:betting_summary] = ["John bets 200",
                             "Sally calls 200"]
     body[:replacement_summary] = ["John replaced 2 cards",
-                                  "Sally replaced 0 cards"]       
-    body[:round_summary] = ['John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16']
+                                  "Sally replaced 0 cards"]  
+    hand = ["5c", "3d", "8h", "9d", "Ac"]    
+    body[:round_summary] = ["John won 200 chips with #{hand} for Hand#16"]
     body[:play] = true
     body[:waiting] = false
     body[:game_over] = false
