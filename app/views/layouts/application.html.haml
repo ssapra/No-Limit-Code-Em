@@ -11,14 +11,11 @@
         .container
           %a.logo{:href => "/"} No Limit Code 'Em
           .pull-right
-            %ul.social
-              %li
-                %a.twitter{:href => "http://twitter.com/enova"}
-              %li
-                %a.linked_in{:href => "http://www.linkedin.com/company/enova-financial/careers"}
-              %li
-                %a.facebook{:href => "http://facebook.com/enova"}
-
+            .btn-group
+              %a.btn{:href => "/rules.html"} Rules
+              %a.btn{:href => "/docs.html"} Docs
+              %a.btn{:href => "/help.html"} Help
+              %a.btn{:href => "/code.html"}  Example bot
     .container
       .row
         = yield

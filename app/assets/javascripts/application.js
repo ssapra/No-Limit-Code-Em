@@ -1,4 +1,5 @@
 //= require jquery
+//= require bootstrap-dropdown
 //= require_self
 
 // document ready
