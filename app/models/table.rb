@@ -258,7 +258,7 @@ class Table < ActiveRecord::Base
   end
 
   def last_winner
-    last_win_hand = PlayerActionLog.where("action = 'win'").select { |x| x.table.id == self.id }.last
+    last_win_hand = PlayerActionLog.where("action = 'win'").select { |x| (x.table && x.table.id) == self.id }.last
     return "No Winners Yet" unless last_win_hand
     last_win_logs = PlayerActionLog.where("action = 'win' and hand_id = ?", last_win_hand.hand_id)
     return "No Winners Yet" unless last_win_logs
