@@ -264,7 +264,7 @@ class Table < ActiveRecord::Base
     return "No Winners Yet" unless last_win_logs
     output = ""
     last_win_logs.each do |log|
-      output += "#{ Player.find(log.player_id).name } wins #{ log.amount } chips#{ log.comment }\n"
+      output += "#{ Player.find(log.player_id).name } wins #{ log.amount } chips\n"
     end
     return output
   end
