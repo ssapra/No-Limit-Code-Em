@@ -22,7 +22,7 @@ class Status < ActiveRecord::Base
                                  :losing_time => nil }
       rank += 1
     end
-    PlayerActionLog.where("action = 'lost'").order("id DESC").each do |pal|
+    PlayerActionLog.where("action = 'lost' or action = 'won'").order("id DESC").each do |pal|
       player = Player.find(pal.player_id)
       leaderboard[player.id] = { :rank => rank,
                                  :name => player.name,
@@ -37,10 +37,10 @@ class Status < ActiveRecord::Base
 
   def self.get_players_at_tables
     tables = {}
-    Table.all.each do |table|
+    Table.order(:id).each do |table|
       begin
         tables[table.id] = { :last_winner => table.last_winner,
-                             :players => table.players }
+                             :players => table.players.where("in_game = true") }
       rescue
         # table has been destroyed, do nothing
       end
