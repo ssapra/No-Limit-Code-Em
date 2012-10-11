@@ -37,7 +37,7 @@ a { &:hover { text-decoration: none; } }
 #content, #sidebar, .registration {
   background: white;
   border-radius: 4px;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.2);
+  @include box-shadow(#{0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.2)});
 
   h2 { 
     background: #fff;
@@ -65,11 +65,18 @@ a { &:hover { text-decoration: none; } }
     width: 48%;
     margin-right: 20px;
     margin-bottom: 20px; 
-    padding-bottom: 10px; 
     background: image-url('pattern.png');
     @include border-radius(8px);
+    -webkit-background-clip: padding-box;
+    @include box-shadow(#{0 0 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.5)});
+    @include transition(all 0.3s linear);
 
     &:nth-child(even) { margin-right: 0 }
+    &.hover {
+      @include box-shadow(0px 3px 12px 2px rgba(0,0,0,0.5));
+      top: -2px;
+      position: relative;
+    }
 
     .players {
       margin: 10px 0px;
@@ -97,23 +104,26 @@ a { &:hover { text-decoration: none; } }
       margin: 0;
       padding: 5px 10px;
       line-height: 24px;
-      font-size: 1.3em;
+      font-size: 1.4em;
       color: #fff;
-      background: rgba(0,0,0,0.5);
+      background: image-url('wood.png') rgba(0,0,0,0.5);
       text-align: center;
-      text-shadow: 0px 2px 1px #000;
+      text-shadow: 0px 1px 0px rgba(0,0,0,0.7);
       @include border-radius(8px 8px 0px 0px);
+      border-bottom: 2px solid rgba(0,0,0,0.7);
 
       &.last_winner { 
+        margin-top: 10px;
         @include border-radius(0 0 8px 8px);
         background: rgba(0,0,0,0.2);
+        border-bottom: none;
         text-shadow: none;
         line-height: 24px;
         font-size: 1em;
         text-align: left;
 
         i {
-          @include opacity(0.7);
+          @include opacity(0.3);
           margin-right: 3px;
         }
       }
@@ -135,17 +145,30 @@ a { &:hover { text-decoration: none; } }
   }
 }
 
-i.stack {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  margin-top: 1px;
-  line-height: 14px;
-  vertical-align: text-top;
-  background: image-url('stack.png') no-repeat;
-  background-size: 14px;
-  opacity: 0.8;
-  margin-right: 2px;
+.player {
+  i.chip {
+    &:first-child { margin-right: -13px; }
+    &:last-child { margin-right: 0px; margin-left: 0px; }  
+  }
+}
 
-  &.clean { background: image-url('stack_clean.png') no-repeat; background-size: 14px; }
+i.chip {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-top: -1px;
+  line-height: 18px;
+  vertical-align: text-top;
+  background: image-url('chip_sprite.png') no-repeat;
+  background-position: 0 0;
+
+  &:last-child { margin-left: -13px; }  
+  &.chip-bordered { background: image-url('chip_sprite_bordered.png') no-repeat; }
+  &.chip-white{ background-position: 0 0 }
+  &.chip-red{ background-position: -20px 0 }
+  &.chip-green{ background-position: -40px 0 }
+  &.chip-black{ background-position: -60px -20px }
+  &.chip-purple{ background-position: -60px 0 }
+  &.chip-yellow{ background-position: 0 -20px }
+  &.chip-gray{ background-position: -60px 0 }
 }   
