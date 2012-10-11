@@ -19,12 +19,12 @@ class RequestsController < ApplicationController
       body = respond_to_request(params[:name], params[:game_id])
     end
     message = "#{body[:message]}"
-    if body[:player_key] then message += " Your player key is #{body[:player_key]}" end
-    flash[:notice] = message
+    message += " Your player key is: <span>#{body[:player_key]}</span>" if body[:player_key]  
+    flash[:notice]= message.html_safe
     logger.debug "body: #{body}"
     respond_to do |format|
       format.json {render :json => body, :status => 200}
-      format.html {redirect_to root_path}
+      format.html {redirect_to '/registration'}
       format.xml {render :xml => body, :status => 200}
     end
   end

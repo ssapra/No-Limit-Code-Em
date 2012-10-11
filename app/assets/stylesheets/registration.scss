@@ -24,8 +24,15 @@ $form-width: 450px;
       .alert { 
         padding: 8px 35px 8px 10px;
         cursor: pointer; 
-        margin-bottom: 15px;
+        margin-bottom: 10px;
+        @include box-shadow(none);
+        font-size: 14px;
 
+        span { 
+          display: block; 
+          margin-top: 5px; 
+          font-weight: bold;
+        }
         &:hover .icon { 
           @include opacity(0.3);
         }
