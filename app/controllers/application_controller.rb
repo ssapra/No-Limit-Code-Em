@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
         body = {:message => "Invalid name/game_id combination."}
       end
     elsif Status.first.registration # If registration is still toggled on
-      player = Player.new(:name => name, :game_id => game_id, :stack => 100)
+      player = Player.new(:name => name, :game_id => game_id, :stack => 250)
       if player.valid?          # Checks if name and game_id are unique and valid
         player.player_key = Digest::MD5.hexdigest("#{player.name} #{player.game_id.to_i} TREY")  #player key assigned
         player.save
