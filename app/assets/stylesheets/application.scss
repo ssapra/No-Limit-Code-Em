@@ -62,8 +62,63 @@ a { &:hover { text-decoration: none; } }
   .poker_table {
     float: left;
     font-size: 0.8em;
-    width: 30%;
+    width: 48%;
     margin-right: 20px;
+    margin-bottom: 20px; 
+    padding-bottom: 10px; 
+    background: image-url('pattern.png');
+    @include border-radius(8px);
+
+    &:nth-child(even) { margin-right: 0 }
+
+    .players {
+      margin: 10px 0px;
+      padding: 0;
+      li { 
+        list-style: none;
+        float: left;
+        width: 33%;
+        margin-bottom: 40px; 
+        span {
+          text-align: center;
+          padding: 0px 10px;
+          display: block;
+          &.name { font-weight: bold; color: #fff; }
+          &.stack { color: #fff; }
+        }
+
+        &.bottom { 
+          margin-bottom: 0px; 
+        }
+      }
+    }
+
+    h3 { 
+      margin: 0;
+      padding: 5px 10px;
+      line-height: 24px;
+      font-size: 1.3em;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      text-align: center;
+      text-shadow: 0px 2px 1px #000;
+      @include border-radius(8px 8px 0px 0px);
+
+      &.last_winner { 
+        @include border-radius(0 0 8px 8px);
+        background: rgba(0,0,0,0.2);
+        text-shadow: none;
+        line-height: 24px;
+        font-size: 1em;
+        text-align: left;
+
+        i {
+          @include opacity(0.7);
+          margin-right: 3px;
+        }
+      }
+    }
+
   }
 }
 
@@ -77,18 +132,20 @@ a { &:hover { text-decoration: none; } }
   }
   tbody {
     tr { &.lost { opacity: 0.5 } }
-    td i.stack {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      margin-top: 1px;
-      line-height: 14px;
-      vertical-align: text-top;
-      background: image-url('stack.png') no-repeat;
-      background-size: 14px;
-      opacity: 0.8;
-      margin-right: 2px;
-    }
   }
 }
 
+i.stack {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  line-height: 14px;
+  vertical-align: text-top;
+  background: image-url('stack.png') no-repeat;
+  background-size: 14px;
+  opacity: 0.8;
+  margin-right: 2px;
+
+  &.clean { background: image-url('stack_clean.png') no-repeat; background-size: 14px; }
+}   

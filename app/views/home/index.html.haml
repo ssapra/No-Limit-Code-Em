@@ -15,7 +15,7 @@
           %td= data[:name].slice(0,20)
           %td= data[:losing_time] != nil ? "LOST" : data[:table]
           %td
-            %i.stack
+            %i.stack.clean
             = data[:stack]
 
 .span8
@@ -23,15 +23,22 @@
     %h2 Tables
     #poker_tables
       - @tables.each do |id, data|
-        %table.poker_table.table.table-striped.table-bordered
-          %thead
-            %tr
-              %th Name
-              %th Chips
-          %tbody
-            - data[:players].each do |player|
-              %tr{:class => ("out" if player.in_round)}
-                %td= player.name
-                %td= player.stack
-                %td= player.hand
+        .poker_table
+          %h3 Table #{id}
+          %h3.last_winner
+            %i.icon.icon-white.icon-exclamation-sign
+            = data[:last_winner] 
+          %ul.players
+            - data[:players].each_with_index do |player, i|
+              %li{:class => ("bottom" if (i/3).truncate % 2 == 1)}
+                - if (i/3).truncate % 2 != 1
+                  %span.name= player.name
+                  %span.stack
+                    %i.stack
+                    = player.stack
+                - else
+                  %span.stack
+                    %i.stack
+                    = player.stack 
+                  %span.name= player.name
       .clearfix
