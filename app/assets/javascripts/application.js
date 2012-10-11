@@ -17,7 +17,6 @@ $(document).ready(function() {
   });
 
   // refresh the data
-  setInterval(function() {
     $('.loader').fadeIn();
     $.ajax({
       url: '/refresh',
@@ -26,5 +25,4 @@ $(document).ready(function() {
         $('.loader').fadeOut();
       }
     });
-  }, 5000);
 });

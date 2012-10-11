@@ -11,6 +11,6 @@
       %td= data[:rank]
       %td= data[:name].slice(0,20)
       %td.tab= data[:losing_time] != nil ? "LOST" : data[:table]
-      %td
+      %td.chips
         != stack_display(data[:stack], false)
         = data[:stack] 
