@@ -8,21 +8,25 @@
     <meta content="cVlN8pDZ3+cIL/mQTA7PDZgd3b5Etu4nQYzQt+hs01g=" name="csrf-token" />
   </head>
 
-  <body>
-
+  <body class='docs'>
     <div class='navbar'>
       <div class='navbar-inner'>
         <div class='container'>
           <a class='logo' href='/'>No Limit Code 'Em</a>
+          <div class='pull-right'>
+            <ul class='social'>
+              <li><a class="twitter" href="http://twitter.com/enova"></a></li>
+              <li><a class="linked_in" href="http://www.linkedin.com/company/enova-financial/careers"></a></li>
+              <li><a class="facebook" href="http://facebook.com/enova"></a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
 
     <div class='container'>
       <div class='row'>
-
         <div class='span8'>
-
           <section id='content'>
             <h2>
               Requests 
@@ -30,11 +34,8 @@
             </h2>
 
             <div class='poker_tables_wrapper'>
-
               <div id='poker_tables'>
-
                 <p>There are 2 types of request you will need to make to the server. GET and POST.</p>
-
               </div>
             </div>
           </section>
@@ -42,26 +43,22 @@
           </br>
 
           <section id='content'>
-
             <h2>
-              GET /game_state (Request the game's current state)
+              <strong>GET</strong> /game_state (Request the game's current state)
               <div class='loader'></div>
             </h2>
 
             <div class='poker_tables_wrapper'>
               <div id='poker_tables'>
                 <h4>Syntax</h4>
-
                 <h5>Request</h5>
-                
                 <pre>
 json
 {
   "name" : "Joe",
   "game_id" : 43123123,
   "player_key" : 031siodfj23290u32
-}  
-                </pre>
+}  </pre>
 
                 <h5>Response</h5>
                 <pre>
@@ -96,9 +93,7 @@ json
     "3. Joe"
   ],
   "message" : "Game is about to Start"
-} 
-                </pre>
-
+} </pre>
               </div>
             </div>
 
@@ -111,35 +106,33 @@ json
               Explanation of Response 
               <div class='loader'></div>
             </h2>
-            <div class='poker_tables_wrapper'>
-              <div id='poker_tables'>
-                <div class='clearfix'></div>
-                <table class='table table-striped' id='scoreboard'>
-                  <thead>
-                    <tr>
-                      <th>Term</th>
-                      <th>Description</th>
-                    </tr>
-                  </thead>
+            <div class='docs poker_tables_wrapper'>
+              <div class='clearfix'></div>
+              <table class='table table-striped' id='scoreboard'>
+                <thead>
                   <tr>
-                    <td>"play"</td>
-                    <td>Signal that it is your turn</td>
+                    <th>Term</th>
+                    <th>Description</th>
                   </tr>
-                  <tr>
-                    <td>"replacement"</td>
-                    <td>true signals that you should be making a post request to replace your cards</td>
-                  </tr>
-                  <tr>
-                    <td>"bet" and "min_bet"</td>
-                    <td>If these two are different, your actions are limited to "call", "raise", or "fold".  If these two are the same value, your actions are limited to "check", "bet", or "fold".
+                </thead>
+                <tr>
+                  <td>"play"</td>
+                  <td>Signal that it is your turn</td>
+                </tr>
+                <tr>
+                  <td>"replacement"</td>
+                  <td>true signals that you should be making a post request to replace your cards</td>
+                </tr>
+                <tr>
+                  <td>"bet" and "min_bet"</td>
+                  <td>If these two are different, your actions are limited to "call", "raise", or "fold".  If these two are the same value, your actions are limited to "check", "bet", or "fold".
 </td>
-                  </tr>
-                  <tr>
-                    <td>"waiting"</td>
-                    <td>True signals that your table is waiting for all other tables to be ready to reshuffle the seats.</td>
-                  </tr>
-                </table>
-              </div>
+                </tr>
+                <tr>
+                  <td>"waiting"</td>
+                  <td>True signals that your table is waiting for all other tables to be ready to reshuffle the seats.</td>
+                </tr>
+              </table>
             </div>
           </section>
 
@@ -148,7 +141,7 @@ json
           <section id='content'>
 
             <h2>
-              POST /player (Making a move)
+              <strong>POST</strong> /player (Making a move)
               <div class='loader'></div>
             </h2>
 
@@ -169,7 +162,7 @@ json
 } 
                 </pre>
                 
-                <p>
+                <p style="font-size: 14px;">
                   <b>Note:</b> When you are determining which cards to replace, set parameters to be "123" to replace your first, second, and third card.
                 </p>
 

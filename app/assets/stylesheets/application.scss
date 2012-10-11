@@ -110,3 +110,9 @@ i.chip {
   &.chip-yellow{ background-position: 0 -20px }
   &.chip-gray{ background-position: -60px 0 }
 }   
+
+.docs .span8 { margin: 0 auto; float: none; margin-bottom: 30px; }
+.docs #poker_tables { padding: 20px 20px 10px 20px; }
+.docs .table th, .docs .table td { border-left: 1px solid #ddd; }
+.docs h4 { padding: 0; margin: 0 }
+
