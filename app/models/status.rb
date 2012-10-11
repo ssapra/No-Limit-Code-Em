@@ -26,9 +26,9 @@ class Status < ActiveRecord::Base
       player = Player.find(pal.player_id)
       leaderboard[player.id] = { :rank => rank,
                                  :name => player.name,
-                                 :stack => 0,
+                                 :stack => (rank == 1 ? player.stack : 0),
                                  :table => (player.table && player.table.id),
-                                 :losing_time => player.losing_time }
+                                 :losing_time => (rank == 1 ? nil : player.losing_time) }
       rank += 1
     end
 
