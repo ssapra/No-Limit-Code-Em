@@ -249,42 +249,6 @@ In order to make sure that you are sending the correct information and receivng 
     "message" : "Game is about to Start"
   } 
 
-
-=== GET /sandbox/game_over (Getting game state when tournament is over)
-
-==== Syntax
-
-===== Request
-
-  json
-  {
-    "name" : "Joe",
-    "game_id" : 43123123,
-    "player_key" : 031siodfj23290u32
-  }  
-
-===== Response
-  
- json
-  {
-    "message" : "Tournament is Over",
-    "winning_summary" : [
-      "Tournament is Over.",
-      " ", 
-      "Player Standings", 
-      "----------------",
-      "1. Player A",
-      "2. Player C",
-      "3. Player B"
-     ],
-    "round_summary" : [
-       'John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16',
-       'Sally won 1200 chips with ["4c", "8c", "2c", "9c", "Tc"] for Hand#17'
-    ],
-    "game_over" : true
-  }
-
-
 === POST /sandbox/player_action (Posting action)
 
 ==== Syntax
