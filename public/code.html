@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>No Limit Code 'Em | Code</title>
+    <link href="/assets/application-ad5d3b2f6cddd1c5e15b9194c6e72055.css" media="all" rel="stylesheet" type="text/css" />
+    <meta content="authenticity_token" name="csrf-param" />
+    <meta content="cVlN8pDZ3+cIL/mQTA7PDZgd3b5Etu4nQYzQt+hs01g=" name="csrf-token" />
+  </head>
+
+  <body>
+
+    <div class='navbar'>
+      <div class='navbar-inner'>
+        <div class='container'>
+          <a class='logo' href='/'>No Limit Code 'Em</a>
+        </div>
+      </div>
+    </div>
+
+    <div class='container'>
+
+      <div class='row'>
+
+        <div class='span8'>
+
+          <section id='content'>
+
+            <h2>
+              Example Client Code 
+              <div class='loader'></div>
+            </h2>
+
+            <div class='poker_tables_wrapper'>
+
+              <div id='poker_tables'>
+
+                <pre>
+def dumb_poker_player(http, name, key)
+
+  # Infinite Loop
+  while true 
+    
+    # Your client should sleep 1 second.
+    # If you send too many requests at once, we will start throttling your requests.
+    # This will cause you to reach the timeout limit which will cause your player to FOLD.
+    sleep 1
+
+    # GET request.
+    # Ask the server "What is going on?"
+    response = game_state(http, name, key)
+
+    # Parse the response.
+    turn_data = JSON.parse(response.body)
+    action, parameter = "", ""
+    
+    # Logic!!
+    # This logic is pretty sweet. But, yours should be more epic!
+    if turn_data["play"]
+    
+      if turn_data["replacement"]
+        action = "replacement"
+        parameter = (1..5).to_a.shuffle.first(rand(3)).join
+      elsif turn_data["min_bet"] > 0
+        if rand(10) < 6
+          action = "raise"
+          parameter = turn_data['min_bet']
+        else
+          action = "fold"
+        end
+      else
+        action = "check"
+      end
+    else
+      next
+    end
+
+    # POST a request to the server
+    response = player_action(http, name, key, action, parameter)
+
+  end
+
+end
+
+# GET
+def game_state(http, name, key)
+  request = Net::HTTP::Get.new("/game_state?name=#{name}&player_key=#{key}")
+  http.request request
+end
+
+# POST
+def player_action(http, name, key, action, parameter)
+  request = Net::HTTP::Post.new("/player")
+  request.set_form_data(:name => name, :player_key => key, :player_action => action, :parameters => parameter)
+  http.request request
+end
+                </pre>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </body>
+
+</html>
+
