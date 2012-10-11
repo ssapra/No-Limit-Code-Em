@@ -10,8 +10,21 @@
 $(document).ready(function() {
   $('.field').placeHeld();
 
+  // scoreboard player hover
   $('.player').hover(function() {
     var number = $(this).find('.tab').text();
     $('#poker_tables').find('.table_'+number).toggleClass('hover');
   });
+
+  // refresh the data
+  setInterval(function() {
+    $('.loader').fadeIn();
+    $.ajax({
+      url: '/refresh',
+      type: 'POST',
+      success: function(data) {
+        $('.loader').fadeOut();
+      }
+    });
+  }, 5000);
 });

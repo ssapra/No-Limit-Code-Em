@@ -1,0 +1,2 @@
+$('.poker_tables_wrapper').html("<%= escape_javascript(render :partial => "poker_tables", :locals => {:tables => @tables}) %>");
+$('.scoreboard_wrapper').html("<%= escape_javascript(render :partial => "scoreboard", :locals => {:scoreboard => @scoreboard}) %>");

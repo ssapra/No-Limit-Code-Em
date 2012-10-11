@@ -34,6 +34,14 @@ a { &:hover { text-decoration: none; } }
   font-size: 1.6em;
 }
 
+.loader {
+  width: 32px;
+  height: 32px;
+  float: right;
+  display: none;
+  background: image-url('loader.gif') no-repeat;
+}
+
 #content, #sidebar, .registration {
   background: white;
   border-radius: 4px;
@@ -137,18 +145,19 @@ a { &:hover { text-decoration: none; } }
   thead {
     tr { 
       th { border-left: 1px solid #ddd; }
-      th:first-child { border-left: none }
+      th:first-child { border-left: none } 
     }
   }
   tbody {
-    tr { &.lost { opacity: 0.5 } }
-  }
-}
-
-.player {
-  i.chip {
-    &:first-child { margin-right: -13px; }
-    &:last-child { margin-right: 0px; margin-left: 0px; }  
+    tr { 
+      &.lost { opacity: 0.5 }
+      &.player {
+        i.chip {
+          &:first-child { margin-right: -13px; }
+          &:last-child { margin-right: 0px; margin-left: 0px; }  
+        }
+      }
+    }
   }
 }
 

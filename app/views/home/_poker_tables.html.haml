@@ -1,0 +1,22 @@
+#poker_tables
+  - tables.each do |id, data|
+    .poker_table{:class => "table_#{id}"}
+      %h3 Table #{id}
+      %ul.players
+        - data[:players].each_with_index do |player, i|
+          %li{:class => ("bottom" if (i/3).truncate % 2 == 1)}
+            - if (i/3).truncate % 2 != 1
+              %span.name= player.name
+              %span.stack
+                != stack_display(player.stack)
+                = player.stack
+            - else
+              %span.stack
+                != stack_display(player.stack)
+                = player.stack 
+              %span.name= player.name
+      .clearfix
+      %h3.last_winner
+        %i.icon.icon-white.icon-exclamation-sign
+        = data[:last_winner]  
+  .clearfix 

@@ -2,6 +2,7 @@ ServerApp::Application.routes.draw do
 
   get "/" => 'home#index', :as => :root
   post "/" => 'requests#registration' #player registers here
+  post "/refresh" => 'home#update' #player registers here
 
   get "/requests" => 'requests#display', :as => :display #admin display page
   get "/registration" => 'requests#new_player', :as => :register
