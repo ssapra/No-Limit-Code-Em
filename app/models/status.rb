@@ -38,8 +38,12 @@ class Status < ActiveRecord::Base
   def self.get_players_at_tables
     tables = {}
     Table.all.each do |table|
-      tables[table.id] = { :last_winner => table.last_winner,
-                           :players => table.players }
+      begin
+        tables[table.id] = { :last_winner => table.last_winner,
+                             :players => table.players }
+      rescue
+        # table has been destroyed, do nothing
+      end
     end
     tables
   end
