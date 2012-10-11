@@ -6,7 +6,7 @@ end
 def run_timeout_bot!
   start_time = Time.now
   while Status.first.game do
-    Table.all.each do |active_table|
+    Table.order(:id).all.each do |active_table|
       begin
         active_table.reload
         next unless active_table.turn_id
