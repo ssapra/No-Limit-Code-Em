@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>No Limit Code 'Em | Sandbox Testing</title>
+    <link href="/assets/application-ad5d3b2f6cddd1c5e15b9194c6e72055.css" media="all" rel="stylesheet" type="text/css" />
+    <meta content="authenticity_token" name="csrf-param" />
+    <meta content="cVlN8pDZ3+cIL/mQTA7PDZgd3b5Etu4nQYzQt+hs01g=" name="csrf-token" />
+  </head>
+
+  <body class='docs'>
+    <div class='navbar'>
+      <div class='navbar-inner'>
+        <div class='container'>
+          <a class='logo' href='/'>No Limit Code 'Em</a>
+          <div class='pull-right'>
+            <ul class='social'>
+              <li><a class="twitter" href="http://twitter.com/enova"></a></li>
+              <li><a class="linked_in" href="http://www.linkedin.com/company/enova-financial/careers"></a></li>
+              <li><a class="facebook" href="http://facebook.com/enova"></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='container'>
+      <div class='row'>
+        <div class='span8'>
+          <section id='content'>
+            <h2>
+              Sandbox Testing 
+              <div class='loader'></div>
+            </h2>
+
+            <div class='poker_tables_wrapper'>
+              <div id='poker_tables'>
+                <p>In order to make sure that you are sending the correct requests and receiving the correct information, you can use this Sandbox Testing routes.</p>
+              </div>
+            </div>
+          </section>
+
+          </br>
+
+          <section id='content'>
+            <h2>
+              <strong>GET</strong> /sandbox/current_turn (Get the game's state.)
+              <div class='loader'></div>
+            </h2>
+
+            <div class='poker_tables_wrapper'>
+              <div id='poker_tables'>
+                <h4>Syntax</h4>
+                <h5>Request</h5>
+                <pre>
+json
+{
+  "name" : "Joe",
+  "game_id" : 43123123,
+  "player_key" : 031siodfj23290u32
+}  
+                </pre>
+
+                <h5>Response</h5>
+                <pre>
+json
+{
+  "current_player" : "Joe",
+  "replacement" : false,
+  "hand" : ["5c", "8d", "3d", "As", "Kh"], 
+  "bet" : 100,
+  "stack" : 400,
+  "pot" : 140,
+  "min_bet" : 50,
+  "max_bet" : 360,
+  "max_raise" : 160,
+  "betting_summary" : [
+    "Sally bets 50",
+    "John calls 50"
+  ],   
+  "replacement_summary" : [
+    "Sally replaces 3 cards",
+    "John replaces 2 cards"
+  ],
+  "round_summary" : [
+    "John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16
+  ],
+  "play" : true,
+  "waiting" :false,
+  "game_over" : false,
+  "message" : "Game is about to Start"
+} 
+                </pre>
+              </div>
+            </div>
+
+          </section>
+
+          </br>
+
+          <section id='content'>
+
+            <h2>
+              <strong>POST</strong> /sandbox/player_action (Posting an action.)
+              <div class='loader'></div>
+            </h2>
+
+            <div class='poker_tables_wrapper'>
+              <div id='poker_tables'>
+                <h4>Syntax</h4>
+
+                <h5>Request</h5>
+                
+                <pre>
+json
+{
+  "name" : "Joe",
+  "game_id" : 43123123,
+  "player_key" : 031siodfj23290u32,
+  "player_action" : "replce",
+  "parameters" : "125"
+}  
+                </pre>
+                
+                <h5>Response</h5>
+
+                <pre>
+json
+{
+  [
+    "---Received---",
+    "Name: Joe",
+    "ID: 43123123",
+    "Player key: 031siodfj23290u32",
+    "Action: replce",
+    "Parameters: 125",
+    " ",
+    "Invalid Action: replce"
+  ]
+} 
+                </pre>
+
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+    </div>
+
+  </body>
+</html>
+
