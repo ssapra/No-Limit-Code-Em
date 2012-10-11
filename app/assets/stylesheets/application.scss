@@ -37,6 +37,25 @@ a { &:hover { text-decoration: none; } }
     } 
     .pull-right {
       margin-top: 20px;
+      .social {
+        li {
+          float: left;
+          list-style: none;
+          a {
+            display: block;
+            width: 30px;
+            @include opacity(0.1);
+            @include transition(0.3s all linear);
+            height: 30px;
+            margin-left: 5px;
+            margin-top: 7px;
+            &:hover { @include opacity(0.2); }
+            &.twitter { background: image-url('twitter.png') no-repeat; }
+            &.linked_in { background: image-url('facebook.png') no-repeat; }
+            &.facebook { background: image-url('linked_in.png') no-repeat; }
+          }
+        }
+      }
     }
   }
 }
