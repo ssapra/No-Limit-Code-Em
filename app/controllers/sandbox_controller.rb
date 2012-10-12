@@ -6,7 +6,7 @@ class SandboxController < ApplicationController
     player_key = params[:player_key]
     player_action = params[:player_action]
     parameters = params[:parameters]
-    actions = ["check", "bet", "call", "raise", "fold"]
+    actions = ["check", "bet", "call", "raise", "fold", "replacement"]
     
     body = ["---Received---",
             "Name: #{name}",
