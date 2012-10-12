@@ -58,7 +58,11 @@
 json
 {
   "name" : "Joe",
+
+  // The Student ID (or number) you registered with.
   "game_id" : 43123123,
+
+  // The API key that we gave to you when you registered.
   "player_key" : "031siodfj23290u32"
 }  </pre>
 
@@ -66,34 +70,80 @@ json
                 <pre>
 json
 {
+  // The current play who needs to act.
   "current_player" : "Sally",
+
+  // If "true", current_player needs to send "replacement" action.
+  // If "false", current_player must do any other action.
   "replacement" : false,
+
+  // Your hand
   "hand" : ["Ac", "3d", "8c", "Ts", "Ah"],
+
+  // What you have bet so far.
+  //
+  // Only "bet" if "bet" == "min_bet."
+  //   Then, the maximum bet allowed will be "max_bet".
+  //   Or, "check" to bet 0.
+  // 
+  // If bet < min_bet
+  //   "raise" up to the max_raise
+  //   Or, "call" to put in [ min_bet - bet ].
   "bet" : 40,
+
+  // Your current chip count, available
   "stack" : 400,
+
+  // Amount currently in the pot
   "pot" : 140,
+
+  // The minimum total amount per player required to stay in the hand.
+  // If you "call", you put in [ min_bet - bet ].
   "min_bet" : 50,
+
+  // The maximum that you can possibly bet.
+  // [ stack - bet ]
+  // Only use "max_bet" when 
   "max_bet" : 360,
+
+  // Maximum amount you can raise above the minimum bet.
+  // Raise [ x ] will put in [ min_bet - bet + x ].
   "max_raise" : 160,
+
+  // Betting history for this round in chronological order.
   "betting_summary" : [
     "Sally bets 50",
     "John calls 50"
   ],   
+
+  // The card replacment history for this round in chronological order.
   "replacement_summary" : [
     "Sally replaces 3 cards",
     "John replaces 2 cards"
   ],
+
+  // Winning hands history in chronological order.
   "round_summary" : [
     "Sally won 300 chips with ["2c", "2d", "2h", "3h", "3c"] for Hand#14",
     "John won 200 chips with ["5c", "3d", "8h", "9d", "Ac"] for Hand#16
   ],
+
+  // If "true", it is your turn.
   "play" : true,
+
+  // If "true", the table is waiting for re-shuffling seats.
+  // This is not important for your player.
   "waiting" :false,
+
+
+  // The list of winners for the entire tournament.
   "winning_summary" : [
     "1. Sally",
     "2. John",
     "3. Joe"
   ],
+
+  // You can ignore this.
   "message" : "Game is about to Start"
 } </pre>
               </div>
