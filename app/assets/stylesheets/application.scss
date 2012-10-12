@@ -8,7 +8,7 @@
 @import "registration";
 
 body {
-  font: 1em proxima-nova-1, proxima-nova-2, Helvetica, Arial, sans-serif;
+  font: 1em Helvetica, Arial, sans-serif;
   background: image-url('background.gif');
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: none;
@@ -32,7 +32,7 @@ a { &:hover { text-decoration: none; } }
       opacity: 1;
       line-height: 80px;
       padding-left: 210px;
-      font-size: 1.6em;
+      font-size: 1.3em;
       float: left;
     } 
     .pull-right {
