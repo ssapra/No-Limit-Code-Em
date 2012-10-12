@@ -6,7 +6,7 @@
         - data[:players].each_with_index do |player, i|
           %li{:class => ("bottom" if (i/3).truncate % 2 == 1)}
             - if (i/3).truncate % 2 != 1
-              %span.name= player.name
+              %span.name= player.name.slice(0,15)
               %span.stack
                 != stack_display(player.stack)
                 = player.stack
